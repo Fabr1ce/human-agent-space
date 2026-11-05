@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://human-agent-space.dev/schemas/rule.schema.json",
+  "title": "Human-Agent Space rule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "description",
+    "scope",
+    "priority",
+    "globs",
+    "author"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rule-[A-Za-z0-9._-]+$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "enum": ["global", "project"]
+    },
+    "priority": {
+      "type": "integer"
+    },
+    "globs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "author": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

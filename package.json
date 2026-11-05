@@ -1,0 +1,33 @@
+{
+  "name": "has",
+  "version": "0.1.0",
+  "description": "A local-first, agent-independent human and coding-agent workspace",
+  "type": "module",
+  "bin": {
+    "has": "./dist/bin/has.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "commander": "^14.0.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "minimatch": "^11.0.4"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.15.30",
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.12"
+  }
+}
