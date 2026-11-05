@@ -163,6 +163,13 @@ to it through documented interfaces.
 - **REQ-NF-14** Derived data (indexes, caches) MUST be rebuildable from authoritative files at any time.
 - **REQ-NF-15** Agent-specific logic MUST be entirely contained within adapter modules; the core MUST NOT contain agent-specific path or formatting logic.
 
+### Code Simplicity
+- **REQ-NF-16** Every line of code MUST be required by a current task's acceptance criteria. Speculative, future-proofing, or "just in case" code is not permitted.
+- **REQ-NF-17** Duplicate logic MUST NOT exist. If the same operation is needed in more than one place, it MUST be extracted into a shared utility before the second use is written.
+- **REQ-NF-18** Dead code (unused imports, functions, types, variables) MUST NOT be committed.
+- **REQ-NF-19** Abstractions (interfaces, generics, base classes, layers) MUST NOT be added until there are at least two verified, concrete implementations that require them.
+- **REQ-NF-20** The review agent MUST treat simplicity violations (REQ-NF-16 through REQ-NF-19) as FAIL findings, not warnings. A phase is not complete if any simplicity FAIL is unresolved.
+
 ---
 
 ### 13. Observability

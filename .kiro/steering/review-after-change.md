@@ -10,7 +10,17 @@ After completing any change to code, spec, configuration, or documentation in th
 
 2. **Call the review agent** — invoke the `code-reviewer` agent (or the default agent if no reviewer is configured) to review the change with this prompt:
 
-   > Review the changes in the last commit. Check for: correctness, consistency with the spec in `.kiro/specs/human-agent-space/`, security issues, missing tests or acceptance criteria coverage, and any deviations from the ADRs in `.kiro/specs/human-agent-space/decisions/ADRs.md`. Report findings as PASS, WARN, or FAIL with a brief explanation for each.
+   > Review the changes in the last commit. Check for:
+   > - Correctness and consistency with the spec in `.kiro/specs/human-agent-space/`
+   > - Security issues
+   > - Missing tests or acceptance criteria coverage
+   > - Deviations from the ADRs in `.kiro/specs/human-agent-space/decisions/ADRs.md`
+   > - **Unnecessary code** — any code that is not required by a current task's acceptance criteria
+   > - **Duplicate code** — logic that already exists elsewhere in the codebase; extract or reuse instead
+   > - **Premature abstraction** — interfaces, generics, or layers added speculatively without a verified need
+   > - **Dead code** — imports, functions, types, or variables that are defined but never used
+   >
+   > Report findings as PASS, WARN, or FAIL with a brief explanation for each. Simplicity failures (unnecessary, duplicate, or dead code) are FAIL, not WARN.
 
 3. **Act on findings** — address any FAIL findings before moving to the next task. WARN findings must be acknowledged and either resolved or recorded as a known limitation with a reason.
 
