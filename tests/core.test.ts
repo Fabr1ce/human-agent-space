@@ -116,6 +116,18 @@ describe('frontmatter and writes', () => {
     await expect(readFile(filePath, 'utf8')).resolves.toBe('new');
   });
 
+  it('cleans up a failed atomic write without changing the existing destination', async () => {
+    const root = await makeTemporaryDirectory();
+    const destination = path.join(root, 'state');
+    await mkdir(destination);
+    await writeFile(path.join(destination, 'sentinel.txt'), 'original');
+
+    await expect(atomicWriteFile(destination, 'replacement')).rejects.toBeDefined();
+
+    await expect(readFile(path.join(destination, 'sentinel.txt'), 'utf8')).resolves.toBe('original');
+    await expect(listFiles(root, '*.tmp')).resolves.toEqual([]);
+  });
+
   it('lists files by glob recursively', async () => {
     const root = await makeTemporaryDirectory();
     await mkdir(path.join(root, 'nested'), { recursive: true });
