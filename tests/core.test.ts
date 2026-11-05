@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -125,7 +125,8 @@ describe('frontmatter and writes', () => {
     await expect(atomicWriteFile(destination, 'replacement')).rejects.toBeDefined();
 
     await expect(readFile(path.join(destination, 'sentinel.txt'), 'utf8')).resolves.toBe('original');
-    await expect(listFiles(root, '*.tmp')).resolves.toEqual([]);
+    const remaining = await readdir(root);
+    expect(remaining.filter((name) => name.endsWith('.tmp'))).toEqual([]);
   });
 
   it('lists files by glob recursively', async () => {
