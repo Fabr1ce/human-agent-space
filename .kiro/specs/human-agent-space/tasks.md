@@ -1,10 +1,11 @@
 # Tasks: Human-Agent Space
 
-Each task maps to a discrete, verifiable unit of work. The MVP consists only of
-Phases 1 and 2 through TASK-2.5 below. All later tasks are roadmap backlog, not
-authorization to build them. Tasks within an approved phase may be worked in
-parallel where dependencies allow. No phase begins until the human approves its
-plan, and no phase is complete until its acceptance criteria pass.
+Each task maps to a discrete, verifiable unit of work. The MVP consists of Phase 1
+except tasks explicitly marked post-MVP, and Phase 2 through TASK-2.5. All other
+tasks are roadmap backlog, not authorization to build them. Tasks within an
+approved phase may be worked in parallel where dependencies allow. No phase begins
+until the human approves its plan, and no phase is complete until its acceptance
+criteria pass.
 
 ---
 
@@ -93,16 +94,16 @@ plan, and no phase is complete until its acceptance criteria pass.
 - **Acceptance:** Written finding exists; human approves or rejects dependency before TASK-2.4 starts
 
 ### TASK-2.2 GitHub Copilot adapter
-- Research and document Copilot instruction file paths and custom instructions support
+- Research and document Copilot instruction file paths, custom instructions, and skill projections
 - Implement the concrete adapter behavior and fixture-based tests for plan, apply, check, and adopt
 - Record findings in `docs/ADAPTERS.md` with verified/unverified status
-- **Acceptance:** Behavior is verified against documented Copilot support; fixture tests pass; ADAPTERS.md entry is complete
+- **Acceptance:** Rules and skills project to the documented Copilot formats; behavior is verified against documented support; fixture tests pass; ADAPTERS.md entry is complete
 
 ### TASK-2.3 Claude Code adapter
-- Research and document Claude Code instruction file paths and skill discovery
+- Research and document Claude Code instruction file paths and native skill discovery
 - Implement the concrete adapter behavior and fixture-based tests for plan, apply, check, and adopt
 - Record findings in `docs/ADAPTERS.md`
-- **Acceptance:** Behavior is verified against documented Claude Code support; fixture tests pass; ADAPTERS.md entry is complete
+- **Acceptance:** Rules and skills project to the documented Claude Code formats; behavior is verified against documented support; fixture tests pass; ADAPTERS.md entry is complete
 
 ### TASK-2.4 Shared sync engine and built-in adapter registry
 - After TASK-2.2 and TASK-2.3, extract only the common adapter contract and registry required by these two verified implementations
@@ -249,27 +250,19 @@ until the MVP is evaluated and a new phase plan is approved.
 
 ---
 
-## Phase 5 — Skills Engine
+## Phase 5 — Skills Roadmap Extensions
 
-### TASK-5.1 Skills registry and validation
-- Implement `SkillRegistry` — discovers `SKILL.md` files in `skills/` dirs (global and project)
-- Validate frontmatter against `skill.schema.json`
-- Never execute scripts during discovery or loading
-- **Acceptance:** Discovery test; invalid frontmatter rejected with useful error; no script execution side effects
-
-### TASK-5.2 Skill search and context integration
-- Implement tag-based and text search over skill registry
-- Skills returned by context engine retrieval (TASK-4.2) by tag match
+### TASK-5.1 Skill search and context integration
+- Implement tag-based and text search over the MVP skill registry
+- Integrate skill selection with context assembly (TASK-4.2)
 - **Acceptance:** Search returns expected skills for known tags; integration with context assembly confirmed
 
-### TASK-5.3 Adapter projections
-- Each adapter can project a skill into agent-native format (linked file, generated block)
+### TASK-5.2 Additional adapter projections
+- Add skill projections for adapters introduced after the MVP
 - Canonical skill is never modified by projection
-- Projections verified for: Kiro, Claude Code, Cursor, Agy, Copilot, Codex
-- **Acceptance:** Projection test per adapter; canonical file unchanged after projection
+- **Acceptance:** Projection test per added adapter; canonical file unchanged after projection
 
-### TASK-5.4 `has skills` CLI commands and import/export
-- `skills list`, `skills show`, `skills validate`
+### TASK-5.3 Skill import/export
 - `has export --skills` / `has import --skills`
 - **Acceptance:** CLI integration tests; export/import round-trip preserves metadata
 
@@ -426,7 +419,7 @@ until the MVP is evaluated and a new phase plan is approved.
 ### TASK-F.5 Full `.agents/` migration
 - Add explicit detect, backup, migrate, and verify tooling for existing `.agents/` directories
 - Preserve unknown files and require human resolution for conflicts
-- Depends on: MVP import path and migration design review
+- Depends on: post-MVP import support (TASK-8.2) and migration design review
 
 ### TASK-F.6 External adapter plugin investigation
 - Evaluate a documented extension API and safe loading model after the two built-in MVP adapters are verified

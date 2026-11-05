@@ -29,7 +29,7 @@ assembly, tasks, MCP, import/export, auditing, and usage tracking are roadmap sc
 and MUST NOT expand the MVP.
 
 For MVP conformance, implement REQ-1.1–1.8, REQ-2.1–2.4, REQ-3.1–3.4,
-REQ-4.1–4.6, REQ-7.1–7.10 for the two named adapters only, REQ-9.3 and REQ-9.7,
+REQ-4.1–4.3 and REQ-4.5–4.6, REQ-7.1–7.10 for the two named adapters only, REQ-9.3 and REQ-9.7,
 and REQ-12.2–12.5. Requirements not listed here are post-MVP, even where they use
 MUST language.
 
@@ -133,8 +133,10 @@ workspace directory.
 - **REQ-9.7** Agents MUST NOT write directly to canonical `AGENTS.md`, rules, or skills.
 - **REQ-9.8** The system MUST provide `audit` and `audit --ci` commands for workspace trust diagnostics.
 
-For the MVP, REQ-9.3 and REQ-9.7 apply to all write paths. The other requirements in
-this section apply when their corresponding roadmap features are implemented.
+For the MVP, REQ-9.3 applies to the CLI write path. When MCP is added, its write
+paths MUST use that same validation and provenance flow. REQ-9.7 applies to all
+MVP write paths. The other requirements in this section apply when their
+corresponding roadmap features are implemented.
 For roadmap memory acceptance, actor identity is provenance and MUST NOT be treated
 as authentication. The local threat model assumes the operating-system user is
 trusted; an interactive confirmation is a workflow safeguard, not protection
