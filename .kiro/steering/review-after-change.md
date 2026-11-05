@@ -22,7 +22,9 @@ After completing any change to code, spec, configuration, or documentation in th
    >
    > Report findings as PASS, WARN, or FAIL with a brief explanation for each. Simplicity failures (unnecessary, duplicate, or dead code) are FAIL, not WARN.
 
-3. **Act on findings** — address any FAIL findings before moving to the next task. WARN findings must be acknowledged and either resolved or recorded as a known limitation with a reason.
+   The reviewer MUST use a different underlying model from the model that authored the change. Prefer an explicitly configured reviewer model from a different model family. Do not assume that using a separate agent or setting both models to `auto` guarantees independence. Verify the reviewer model from available runtime metadata; if it cannot be selected or verified as different, mark the review BLOCKED and request an independent human or model review instead of recording it as complete.
+
+3. **Act on findings** — address any FAIL findings before moving to the next task. WARN findings must be acknowledged and either resolved or recorded as a known limitation with a reason. A BLOCKED review must be resolved through the independent review path above before the change is considered complete.
 
 4. **Do not skip** — this rule applies to all changes: spec edits, code, config, documentation, and schema updates. A change is not complete until it has been reviewed.
 
