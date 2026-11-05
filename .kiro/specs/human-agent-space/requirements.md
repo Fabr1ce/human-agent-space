@@ -11,6 +11,32 @@ and working history.
 The workspace owns the knowledge. Agents are clients that consume and contribute
 to it through documented interfaces.
 
+## Release Scope
+
+This document describes the product roadmap; not every requirement is part of the
+first release. The **MVP** is limited to:
+
+- Global and project workspace initialization, configuration, status, and doctor.
+- Canonical human-authored rules and skills, with list/show/validate commands.
+- A safe, reviewable sync workflow for **GitHub Copilot and Claude Code only**.
+- JSON output, dry-run planning, drift detection, and preservation of hand-authored
+  agent configuration for those workflows.
+
+The MVP succeeds when a developer can initialize a workspace, define a rule and a
+skill once, preview and sync them to both supported agents without overwriting
+hand-authored files, and detect subsequent drift. Requirements for memory, context
+assembly, tasks, MCP, import/export, auditing, and usage tracking are roadmap scope
+and MUST NOT expand the MVP.
+
+For MVP conformance, implement REQ-1.1–1.8, REQ-2.1–2.4, REQ-3.1–3.4,
+REQ-4.1–4.6, REQ-7.1–7.10 for the two named adapters only, REQ-9.3 and REQ-9.7,
+and REQ-12.2–12.5. Requirements not listed here are post-MVP, even where they use
+MUST language.
+
+The local/session data root is `<workspace>/.local/` (that is, `~/.has/.local/` for
+global data and `<repo>/.has/.local/` for project data); it is not a second
+workspace directory.
+
 ---
 
 ## Functional Requirements
@@ -19,7 +45,7 @@ to it through documented interfaces.
 
 - **REQ-1.1** The system MUST support a global workspace at `~/.has/` for developer-level knowledge and preferences shared across all projects.
 - **REQ-1.2** The system MUST support a project workspace at `<repo>/.has/` for knowledge committed with a repository.
-- **REQ-1.3** The system MUST support a local/session scope under `.local/` for temporary, machine-specific, or sensitive data that is gitignored.
+- **REQ-1.3** The system MUST support a local/session scope under `<workspace>/.local/` for temporary, machine-specific, or sensitive data that is gitignored.
 - **REQ-1.4** The system MUST provide an idempotent `init` command for both global and project scopes that never overwrites existing files.
 - **REQ-1.5** The system MUST add local runtime paths to `.gitignore` automatically on `init`.
 - **REQ-1.6** The system MUST resolve scope precedence: project-specific rules override global rules; explicit human-authored instructions take precedence over agent-proposed material.
@@ -84,7 +110,7 @@ to it through documented interfaces.
 - **REQ-7.6** Generated agent configuration files MUST have a clear header identifying them as generated and pointing to the canonical source.
 - **REQ-7.7** The system MUST NEVER silently overwrite hand-authored agent configuration.
 - **REQ-7.8** Direct edits to generated files MUST be detected and surfaced to the user.
-- **REQ-7.9** Initial adapter candidates (in priority order): Kiro, Claude Code, Cursor, Agy (formerly Gemini CLI), Aider, GitHub Copilot, OpenAI Codex.
+- **REQ-7.9** The MVP MUST support GitHub Copilot and Claude Code adapters. Additional adapter candidates, in roadmap priority order, are Kiro, Cursor, Agy (formerly Gemini CLI), Aider, and OpenAI Codex.
 - **REQ-7.10** Adapter capabilities MUST be recorded in `docs/ADAPTERS.md` with verified/partially-verified/unverified status.
 
 ### 8. Collaboration and Task Management
@@ -106,6 +132,13 @@ to it through documented interfaces.
 - **REQ-9.6** The system MUST log security-relevant actions without recording secret values.
 - **REQ-9.7** Agents MUST NOT write directly to canonical `AGENTS.md`, rules, or skills.
 - **REQ-9.8** The system MUST provide `audit` and `audit --ci` commands for workspace trust diagnostics.
+
+For the MVP, REQ-9.3 and REQ-9.7 apply to all write paths. The other requirements in
+this section apply when their corresponding roadmap features are implemented.
+For roadmap memory acceptance, actor identity is provenance and MUST NOT be treated
+as authentication. The local threat model assumes the operating-system user is
+trusted; an interactive confirmation is a workflow safeguard, not protection
+against a same-user process.
 
 ### 10. MCP Server
 
@@ -195,7 +228,9 @@ to it through documented interfaces.
 
 #### 14.8 Designed-for-Later: Task Token Estimation
 
-The following capability is explicitly scoped for a future release. The foundational release MUST define the interface and data structures needed to support it, but MUST NOT implement the full estimation logic.
+Task token estimation is post-MVP scope. When task management is approved, its
+foundational release MUST define the interface and data structures needed to
+support estimation, but MUST NOT implement the full estimation logic.
 
 - **REQ-14.8** The system MUST define a `TaskTokenEstimate` interface with fields for: estimated input tokens, estimated output tokens, confidence level, estimation method, and breakdown by context source.
 - **REQ-14.9** The `task show` command MUST reserve a display section for token estimates that renders "estimation not yet available" in the foundational release.
@@ -204,9 +239,9 @@ The following capability is explicitly scoped for a future release. The foundati
 
 ---
 
-## Out of Scope (Foundational Release)
+## Out of Scope (MVP)
 
-The following are explicitly deferred and MUST NOT be built in the foundational release:
+The following are explicitly deferred and MUST NOT be built in the MVP:
 
 - Autonomous multi-agent orchestration
 - Cloud synchronization or hosted collaboration
@@ -215,4 +250,4 @@ The following are explicitly deferred and MUST NOT be built in the foundational 
 - Automatic codebase-wide knowledge generation
 - Complex workflow automation
 - A full-featured web application (a read-only local view may be approved separately)
-- Full task token estimation logic (interface and data structures are in scope; full estimation is deferred — see REQ-14.8 through REQ-14.11)
+- Task token estimation and its interface placeholder are post-MVP (see REQ-14.8 through REQ-14.11)

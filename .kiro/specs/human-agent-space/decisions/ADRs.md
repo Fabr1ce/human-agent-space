@@ -86,24 +86,22 @@ alternatives considered, and consequences.
 
 ---
 
-## ADR-005 — Adapter priorities: Kiro, Claude Code, Cursor, Agy, Aider, Copilot, Codex
+## ADR-005 — MVP adapters: GitHub Copilot and Claude Code
 
 **Status:** Accepted  
 **Date:** 2026-11-03  
-**Decided by:** Human
+**Decided by:** Human (updated 2026-11-05)
 
-**Decision:** Adapters are implemented in this priority order across Phase 2:
-1. Kiro
-2. Claude Code
-3. Cursor
-4. Agy (formerly Gemini CLI)
-5. Aider
-6. GitHub Copilot
-7. OpenAI Codex
+**Decision:** The MVP supports GitHub Copilot and Claude Code only. Kiro, Cursor,
+Agy (formerly Gemini CLI), Aider, and OpenAI Codex are roadmap candidates, not MVP
+commitments.
 
-**Rationale:** Kiro and Claude Code are highest priority as the most likely early users. Cursor has broad adoption. Agy, Aider, Copilot, and Codex follow based on community usage and MCP support maturity.
+**Rationale:** Validate the canonical workspace and safe sync workflow with two
+concrete adapters before expanding coverage.
 
-**Consequences:** All 7 adapters are in scope for Phase 2. Each requires research before implementation. Any adapter where official documentation cannot be verified must be marked `UNVERIFIED` in `docs/ADAPTERS.md` and in code.
+**Consequences:** Only Copilot and Claude Code are in the MVP adapter phase. Any
+future adapter whose behavior cannot be verified from official documentation must
+be marked `UNVERIFIED` in `docs/ADAPTERS.md` and in code.
 
 ---
 
@@ -113,11 +111,11 @@ alternatives considered, and consequences.
 **Date:** 2026-11-03  
 **Decided by:** Human (default accepted)
 
-**Decision:** Before building a custom sync engine in Phase 2 (TASK-2.3), evaluate `rulesync` and `ruler` as potential dependencies or references. Present findings and wait for approval before proceeding.
+**Decision:** Before building a custom sync engine in Phase 2 (TASK-2.4), evaluate `rulesync` and `ruler` as potential dependencies or references. Present findings and wait for approval before proceeding.
 
 **Rationale:** Avoids reinventing existing tooling. If either project covers the needed surface with acceptable license, maintenance, and safety characteristics, wrapping or depending on it is preferable to a full custom build.
 
-**Consequences:** TASK-2.2 is a hard prerequisite for TASK-2.3. The evaluation result is recorded in `docs/decisions/` before any sync engine code is written.
+**Consequences:** TASK-2.1 is a hard prerequisite for TASK-2.4. The evaluation result is recorded in `docs/decisions/` before any sync engine code is written.
 
 ---
 
@@ -127,8 +125,31 @@ alternatives considered, and consequences.
 **Date:** 2026-11-03  
 **Decided by:** Human (default accepted)
 
-**Decision:** A read-only local web view is not in scope for the foundational release. It is listed as a deferred task (TASK-F.4) and requires explicit human approval before starting.
+**Decision:** A read-only local web view is not in scope for the MVP. It is listed as a deferred task (TASK-F.4) and requires explicit human approval before starting.
 
-**Rationale:** The CLI and MCP interfaces are sufficient for the foundational release. A web UI adds scope and complexity without a validated user need at this stage.
+**Rationale:** The CLI is sufficient for the MVP. A web UI adds scope and complexity without a validated user need at this stage.
 
-**Consequences:** No web server, no frontend build tooling, and no browser-facing code in Phases 1–8. The extension point exists in the architecture but is not wired up.
+**Consequences:** No web server, frontend build tooling, or browser-facing code is included in the MVP. The extension point is not wired up.
+
+---
+
+## ADR-008 — MVP scope and adapter plugins
+
+**Status:** Accepted
+**Date:** 2026-11-05
+**Decided by:** Human
+
+**Decision:** The first release is limited to workspace setup, canonical rules and
+skills, and safe synchronization to GitHub Copilot and Claude Code. The MVP uses
+built-in adapter modules only. External adapter plugin loading is a roadmap
+investigation after both built-in adapters are verified; it is not part of the MVP.
+
+**Rationale:** A narrow end-to-end release tests the product's core value before
+committing to the cost and trust surface of a broad feature set or third-party code
+loading.
+
+**Consequences:** Memory, context assembly, tasks, MCP, import/export, other
+adapters, and plugin loading are not authorized by the MVP plan. Any roadmap phase
+requires a separate human-approved scope and acceptance criteria. The plugin
+investigation must address trust, compatibility, installation, and failure
+isolation before implementation is proposed.

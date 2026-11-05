@@ -22,6 +22,10 @@ All runtime dependencies must be justified. SQLite is optional and derived only 
 
 ## Repository Layout
 
+This is the eventual product layout, not an MVP scaffold checklist. Implement only
+modules required by an approved MVP task; add roadmap modules when their phase is
+approved.
+
 ```
 has/
 ├── package.json
@@ -69,9 +73,10 @@ has/
 │   │   └── export.ts
 │   ├── adapters/                   # Agent Integration
 │   │   ├── interface.ts            # Adapter interface + capability types
-│   │   ├── registry.ts             # Capability registry
-│   │   ├── kiro.ts
+│   │   ├── registry.ts             # Built-in adapter registry
+│   │   ├── copilot.ts
 │   │   ├── claude-code.ts
+│   │   ├── kiro.ts                 # Roadmap adapter
 │   │   ├── cursor.ts
 │   │   ├── agy.ts                  # Agy (formerly Gemini CLI)
 │   │   ├── aider.ts
@@ -141,6 +146,7 @@ memory/
   decisions/
   lessons/
   preferences/
+  constraints/
   inbox/
 projects/
   registry.yaml
@@ -165,6 +171,7 @@ memory/
   decisions/
   lessons/
   preferences/
+  constraints/
   inbox/
 context/
   project-state.md
@@ -479,7 +486,11 @@ Imported content ──► Quarantine/Inbox ──► Review required before use
 ```
 
 - All writes go through the same policy layer regardless of source (CLI or MCP).
-- Agents PROPOSE; only humans ACCEPT durable knowledge via explicit CLI commands.
+- Agents PROPOSE; only an explicit human CLI review can ACCEPT durable knowledge.
+  Acceptance is not exposed through MCP. Actor labels are provenance, not
+  authentication: the local CLI assumes the operating-system user is trusted and
+  does not claim to prevent a same-user process from invoking human-only actions.
+  Interactive confirmation is a workflow safeguard, not a security boundary.
 - Memory content returned in a context package is labeled data, not instructions.
 - Workspace config from a cloned repo cannot elevate its own trust level.
 
@@ -501,16 +512,15 @@ Findings block the write and return structured errors. The scanner does not clai
 
 | Phase | Scope | Key Deliverables |
 |---|---|---|
-| **1** | Workspace Foundation | Directory layout, config + schemas, workspace init, atomic file ops, stable IDs, structured logger, CLI skeleton, test harness |
-| **2** | Agent Adapters | Adapter interface, capability registry, Kiro + Claude Code adapters, sync plan/apply/check/adopt, drift detection, ADAPTERS.md |
-| **3** | Memory Engine | Memory schemas, proposal inbox, provenance model, review workflow, search, index rebuild, secret/injection scanning |
-| **4** | Context Engine | Assembly pipeline, retrieval, filtering, ranking, budget enforcement, pluggable estimator, budget manifest, JSON/Markdown output |
-| **5** | Skills Engine | Skills registry, SKILL.md support, search, adapter projections, import/export |
-| **6** | Collaboration Engine | Shared project state, task CRUD, lifecycle transitions, handoff snapshots, event envelopes with timing, usage recording |
-| **7** | MCP + Human Interfaces | MCP stdio server, all initial tools, CLI polish, human review workflows, MCP registration docs for 2+ agents |
-| **8** | Production Readiness | Doctor diagnostics, audit --ci, import/export hardening, performance baselines, context evaluation report, full docs, CI pipeline |
+| **1 (MVP)** | Workspace foundation, rules, and skills | `.has/` layout, config + schemas, init/status/doctor, canonical rules and skills with list/show/validate, atomic file operations, CLI skeleton, test harness |
+| **2 (MVP)** | Two built-in adapters | Evaluate `rulesync`/`ruler`; safe plan/apply/check for GitHub Copilot and Claude Code; drift detection and adapter documentation |
+| **Later, separately approved** | Product roadmap | Memory, context, collaboration/tasks, MCP, other built-in adapters, import/export, auditing, and production hardening; each requires a scoped plan and human approval after MVP evaluation |
 
-Each phase requires human approval of the phase plan before implementation begins and sign-off on acceptance criteria before the next phase starts.
+No phase beyond the MVP is authorized by this plan. Each approved phase requires
+sign-off on its acceptance criteria before the next phase starts. External
+third-party adapter plugin loading is a roadmap investigation only; the MVP uses
+isolated built-in adapter modules and does not discover or execute installed
+plugins.
 
 ---
 
@@ -524,6 +534,6 @@ All decisions recorded in `decisions/ADRs.md`.
 | D-2 | Canonical project dir: `.human-agent-space/` or shorter (`.has/`)? | `.has/` ✓ |
 | D-3 | License: MIT, Apache 2.0, or other? | MIT ✓ |
 | D-4 | Compatibility path for existing `.agents/` directories? | `has import --from agents` only; auto-migration deferred to TASK-F.5 ✓ |
-| D-5 | Adapter priorities beyond Kiro + Claude Code? | Cursor, Agy, Aider, Copilot, Codex ✓ |
-| D-6 | Evaluate `rulesync`/`ruler` before building custom sync engine? | Yes — TASK-2.2 is a hard gate before TASK-2.3 ✓ |
+| D-5 | Which adapters are in the MVP? | GitHub Copilot and Claude Code; Kiro, Cursor, Agy, Aider, and Codex are roadmap candidates ✓ |
+| D-6 | Evaluate `rulesync`/`ruler` before building custom sync engine? | Yes — TASK-2.1 is a hard gate before TASK-2.4 ✓ |
 | D-7 | Read-only local web view in Phase 7 scope? | No, deferred to TASK-F.4 ✓ |

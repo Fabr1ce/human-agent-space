@@ -1,8 +1,10 @@
 # Tasks: Human-Agent Space
 
-Each task maps to a discrete, verifiable unit of work. Tasks within a phase may be
-worked in parallel where dependencies allow. No phase begins until the human approves
-the phase plan. No phase is marked complete until all its acceptance criteria pass.
+Each task maps to a discrete, verifiable unit of work. The MVP consists only of
+Phases 1 and 2 through TASK-2.5 below. All later tasks are roadmap backlog, not
+authorization to build them. Tasks within an approved phase may be worked in
+parallel where dependencies allow. No phase begins until the human approves its
+plan, and no phase is complete until its acceptance criteria pass.
 
 ---
 
@@ -17,15 +19,15 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 - **Acceptance:** `npm run build` succeeds; `has --version` prints version; `has --help` lists top-level commands
 
 ### TASK-1.2 JSON Schemas
-- Write JSON Schema (draft-07) for: `config`, `memory`, `rule`, `skill`, `task`, `event`
+- Write JSON Schema (draft-07) for MVP formats: `config`, `rule`, `skill`
 - Include `schema_version` field in every schema
 - Wire `ajv` validation into a shared `validate(schema, data)` utility
-- **Acceptance:** Unit tests validate correct documents and reject invalid ones for each schema
+- **Acceptance:** Unit tests validate correct documents and reject invalid ones for each MVP schema
 
 ### TASK-1.3 Workspace root resolution
-- Implement `resolveWorkspace()` — walks up from cwd to find `.human-agent-space/`
-- Resolve global root from `~/.human-agent-space/`
-- Resolve local root as `<project>/.human-agent-space/.local/`
+- Implement `resolveWorkspace()` — walks up from cwd to find `.has/`
+- Resolve global root from `~/.has/`
+- Resolve local root as `<project>/.has/.local/` (or `~/.has/.local/` in global-only mode)
 - Expose `Workspace` object with `globalRoot`, `projectRoot`, `localRoot`, `config`
 - **Acceptance:** Unit tests cover: found at cwd, found in parent, not found (global-only mode), explicit `--workspace` flag override
 
@@ -41,12 +43,12 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 - Implement `listFiles(dir, glob)` — returns matching paths
 - **Acceptance:** Tests cover: round-trip read/write preserves frontmatter; interrupted write does not corrupt original; glob matching works
 
-### TASK-1.6 Stable ID generation
+### TASK-1.6 Stable ID generation (post-MVP)
 - Implement `generateId(prefix)` — returns `<prefix>-<ulid>` (e.g. `mem-01J4K...`)
 - IDs must be lexicographically sortable and unique across cold starts
 - **Acceptance:** Unit tests confirm format, uniqueness across 10k generated IDs, and sort order
 
-### TASK-1.7 Structured logger
+### TASK-1.7 Structured logger (post-MVP)
 - Implement `createLogger(component, opts)` returning a `Logger` instance
 - Support levels: `error`, `warn`, `info`, `debug` (default: `warn`)
 - Write JSON lines to `.local/logs/has-YYYY-MM-DD.log` with daily rotation (keep last 7)
@@ -55,8 +57,8 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 - **Acceptance:** Tests confirm: JSON output format; redaction of sensitive field names; child logger inherits correlation_id; files rotate on date change
 
 ### TASK-1.8 `has init` command
-- Create global workspace layout at `~/.human-agent-space/` when `--global` flag is passed
-- Create project workspace layout at `<cwd>/.human-agent-space/`
+- Create global workspace layout at `~/.has/` when `--global` flag is passed
+- Create project workspace layout at `<cwd>/.has/`
 - Add `.local/` paths to `.gitignore` (append only, never overwrite existing entries)
 - Write starter `config.yaml` and `AGENTS.md` only if they do not exist
 - Must be idempotent — running twice changes nothing
@@ -65,73 +67,83 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 
 ### TASK-1.9 `has status` command
 - Show: workspace roots resolved, config source, schema versions, presence of key directories
-- Show summary of recent context budget usage from `.local/usage/` if available
 - Support `--json` output
 - **Acceptance:** Output correct for global-only and project workspaces; `--json` is valid JSON
 
 ### TASK-1.10 `has doctor` command
-- Check: workspace roots exist, config validates, schemas are current, `.gitignore` entries present
-- Surface last 50 `error` and `warn` log lines from `.local/logs/`
+- Check: workspace roots exist, config validates, schemas are current, `.gitignore` entries present, supported adapter setup is diagnosable
 - Report each check as PASS / WARN / FAIL with a fix suggestion
 - Support `--json` output
 - **Acceptance:** Each check reports correctly for broken and healthy states; fix suggestions are actionable
 
+### TASK-1.11 Canonical rules and skills
+- Implement rule and skill discovery, frontmatter validation, and `rules list|show|validate` / `skills list|show|validate`
+- Route agent-generated rule changes to proposals; never write proposals directly into canonical rules
+- Never execute skill scripts during discovery or loading; protect canonical files from agent overwrite
+- **Acceptance:** Fixture tests cover discovery, validation, and proposal separation; sync plans never target canonical files; invalid metadata is actionable; discovery causes no script execution
+
 ---
 
-## Phase 2 — Agent Adapters and Synchronization
+## Phase 2 (MVP) — Copilot and Claude Code Sync
 
-### TASK-2.1 Adapter interface and capability registry
-- Define `AgentAdapter` interface and `AgentCapabilities` type in `src/adapters/interface.ts`
-- Implement `AdapterRegistry` — register, list, and look up adapters by ID
-- **Acceptance:** Registry tests cover registration, lookup, and unknown-adapter error
-
-### TASK-2.2 Evaluate `rulesync` / `ruler`
+### TASK-2.1 Evaluate `rulesync` / `ruler` (hard gate)
 - Inspect both projects: license, maintenance, adapter coverage, safety, extensibility
 - Present findings and recommendation before any sync engine code is written
 - Record decision in `docs/decisions/`
-- **Acceptance:** Written finding exists; human approves or rejects dependency before TASK-2.3 starts
+- **Acceptance:** Written finding exists; human approves or rejects dependency before TASK-2.4 starts
 
-### TASK-2.3 Sync engine (plan / apply / check / adopt)
+### TASK-2.2 GitHub Copilot adapter
+- Research and document Copilot instruction file paths and custom instructions support
+- Implement the concrete adapter behavior and fixture-based tests for plan, apply, check, and adopt
+- Record findings in `docs/ADAPTERS.md` with verified/unverified status
+- **Acceptance:** Behavior is verified against documented Copilot support; fixture tests pass; ADAPTERS.md entry is complete
+
+### TASK-2.3 Claude Code adapter
+- Research and document Claude Code instruction file paths and skill discovery
+- Implement the concrete adapter behavior and fixture-based tests for plan, apply, check, and adopt
+- Record findings in `docs/ADAPTERS.md`
+- **Acceptance:** Behavior is verified against documented Claude Code support; fixture tests pass; ADAPTERS.md entry is complete
+
+### TASK-2.4 Shared sync engine and built-in adapter registry
+- After TASK-2.2 and TASK-2.3, extract only the common adapter contract and registry required by these two verified implementations
 - Implement `SyncPlanner` — produces a `SyncPlan` describing every intended file operation
 - Implement `SyncApplier` — executes a plan; reports what changed
 - Implement `DriftChecker` — compares generated files to canonical source; returns `DriftReport`
 - `sync --dry-run` must not write; `sync --check` must return non-zero on drift
 - Generated files get a header comment pointing to canonical source
-- **Acceptance:** Idempotency test; dry-run no-write test; drift detection test; hand-authored file preservation test
+- Do not implement dynamic third-party plugin discovery or loading
+- **Acceptance:** Contract/registry tests use both adapters; idempotency, dry-run no-write, drift detection, and hand-authored file preservation tests pass
 
-### TASK-2.4 Kiro adapter
+### TASK-2.5 `has sync` and `has adopt` CLI commands (MVP)
+- `has sync [--agent <id>] [--dry-run]`
+- `has sync --check`
+- `has adopt <generated-file>`
+- Support `--json` output
+- **Acceptance:** CLI integration tests for each mode; exit code is non-zero on drift
+
+The following adapter tasks are post-MVP backlog and require a later scope decision:
+
+### TASK-2.6 Kiro adapter
 - Research and document Kiro instruction file paths, skill discovery, MCP config method
-- Implement `KiroAdapter` implementing `AgentAdapter`
+- Implement `KiroAdapter`
 - Record findings in `docs/ADAPTERS.md` with verified/unverified status
 - **Acceptance:** Fixture-based tests for plan, apply, check, adopt; ADAPTERS.md entry complete
 
-### TASK-2.5 Claude Code adapter
-- Research and document Claude Code instruction file paths, skill discovery, MCP config method
-- Implement `ClaudeCodeAdapter` implementing `AgentAdapter`
-- Record findings in `docs/ADAPTERS.md`
-- **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete
-
-### TASK-2.6 Cursor adapter
+### TASK-2.7 Cursor adapter
 - Research and document Cursor instruction file paths and MCP config method
 - Implement `CursorAdapter` implementing `AgentAdapter`
 - Record findings in `docs/ADAPTERS.md`
 - **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete
 
-### TASK-2.7 Agy adapter
+### TASK-2.8 Agy adapter
 - Research and document Agy (formerly Gemini CLI) instruction file paths and MCP config method
 - Implement `AgyAdapter` implementing `AgentAdapter`
 - Record findings in `docs/ADAPTERS.md` — note the rename from Gemini CLI
 - **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete with rename noted
 
-### TASK-2.8 Aider adapter
+### TASK-2.9 Aider adapter
 - Research and document Aider instruction file paths and config method
 - Implement `AiderAdapter` implementing `AgentAdapter`
-- Record findings in `docs/ADAPTERS.md`
-- **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete
-
-### TASK-2.9 GitHub Copilot adapter
-- Research and document Copilot instruction file paths, custom instructions support, and MCP config method
-- Implement `CopilotAdapter` implementing `AgentAdapter`
 - Record findings in `docs/ADAPTERS.md`
 - **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete
 
@@ -141,12 +153,8 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 - Record findings in `docs/ADAPTERS.md`
 - **Acceptance:** Fixture-based tests; ADAPTERS.md entry complete
 
-### TASK-2.11 `has sync` and `has adopt` CLI commands
-- `has sync [--agent <id>] [--dry-run]`
-- `has sync --check`
-- `has adopt <generated-file>`
-- Support `--json` output
-- **Acceptance:** CLI integration tests for each mode; exit code is non-zero on drift
+All phases below are post-MVP roadmap tasks and are not approved for implementation
+until the MVP is evaluated and a new phase plan is approved.
 
 ---
 
@@ -414,3 +422,13 @@ the phase plan. No phase is marked complete until all its acceptance criteria pa
 - Optional browser UI for browsing workspace, memory, tasks, and context manifests
 - Requires explicit human approval before starting
 - Must not be required for any core functionality
+
+### TASK-F.5 Full `.agents/` migration
+- Add explicit detect, backup, migrate, and verify tooling for existing `.agents/` directories
+- Preserve unknown files and require human resolution for conflicts
+- Depends on: MVP import path and migration design review
+
+### TASK-F.6 External adapter plugin investigation
+- Evaluate a documented extension API and safe loading model after the two built-in MVP adapters are verified
+- Do not load plugins or execute third-party adapter code without a separate approved design
+- **Acceptance:** Recommendation covers trust boundary, compatibility/versioning, installation, and failure isolation; no implementation is implied
