@@ -20,7 +20,7 @@ flowchart LR
   project --> combine
   combine --> preview["Review sync plan"]
   preview --> decision{"Any conflicts?"}
-  decision -- No --> generated["Generated agent-specific files"]
+  decision -- No --> generated["Generated Copilot, Claude, and Kiro files"]
   generated --> agents["Your coding agents"]
   decision -- Yes --> preserved["Keep existing files; apply no changes"]
   preserved --> resolve["Resolve conflicts, or adopt one target"]
@@ -29,11 +29,9 @@ flowchart LR
 
 ## Install HAS from source
 
-Requires Git and Node.js 22 or newer. The npm package is planned as
-`human-agent-space`, but it is not published yet. The short npm name `has`
-belongs to an unrelated package, so `npm install has` will not install
-Human-Agent Space. Once the package is published, install it with
-`npm install --global human-agent-space`. Until then, install from source:
+Requires Git and Node.js 22 or newer. HAS does not yet have a supported npm
+release. The short npm name `has` belongs to an unrelated package, so
+`npm install has` will not install Human-Agent Space.
 
 ```sh
 mkdir -p "$HOME/src"
@@ -60,7 +58,10 @@ under `~/.has/` instead. Continue to invoke the source CLI as `node "$HAS"`
 until a supported package distribution is available. The commands below use
 `$HAS`; set it again if you open a new terminal.
 
-Do not rely on `npx` or `npm exec` for HAS until the npm release is announced.
+**Future download option:** a scoped npm package used through `npx`/`npm exec`
+could avoid both global installation and this manual build. Package ownership,
+name, and release are not established yet, so that route is not available or
+recommended today.
 
 ## Add guidance and sync it
 
@@ -78,8 +79,8 @@ node "$HAS" sync --dry-run --workspace "$PWD"
 node "$HAS" sync --workspace "$PWD"
 ```
 
-Review the dry-run plan, then sync to generate project files for the supported
-coding agents. Use `--agent kiro` to target Kiro alone.
+Review the dry-run plan, then sync to generate project files for GitHub Copilot,
+Claude Code, and Kiro. Use `--agent kiro` to target Kiro alone.
 `node "$HAS" sync --check --workspace "$PWD"` checks whether generated files
 have drifted.
 If any target conflicts with a hand-written or edited file, HAS preserves it
@@ -109,10 +110,3 @@ npm run test:coverage
 ```
 
 The coverage command enforces at least 85% line coverage.
-
-## Community and security
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) to submit changes,
-[SUPPORT.md](SUPPORT.md) for help, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-for community expectations. Report vulnerabilities privately as described in
-[SECURITY.md](SECURITY.md).
