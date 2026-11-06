@@ -84,4 +84,42 @@ describe('CLI', () => {
     expect(report.status).toBe('WARN');
     expect(report.checks.find((check) => check.name === 'agent trust')?.status).toBe('WARN');
   });
+
+  it('supports sync preview, apply, drift checks, and explicit adoption in JSON mode', async () => {
+    const root = await makeTemporaryDirectory();
+    const ruleDirectory = path.join(root, '.has', 'rules');
+    await mkdir(ruleDirectory, { recursive: true });
+    await writeFile(
+      path.join(ruleDirectory, 'cli.md'),
+      `---\nschema_version: 1\nid: rule-cli\ndescription: CLI test rule\nscope: project\npriority: 1\nglobs: [\"src/**/*.ts\"]\nauthor: human\n---\nKeep the CLI safe.\n`,
+    );
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const target = path.join(root, '.github/instructions/rule-cli.instructions.md');
+
+    await run(['sync', '--workspace', root, '--agent', 'copilot', '--dry-run', '--json']);
+    const preview = JSON.parse(output.mock.calls.at(-1)?.[0] as string) as {
+      operations: Array<{ action: string; path: string }>;
+      drift: boolean;
+    };
+    expect(preview.drift).toBe(true);
+    expect(preview.operations).toContainEqual(expect.objectContaining({ action: 'create', path: '.github/instructions/rule-cli.instructions.md' }));
+    await expect(readFile(target, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' });
+
+    await run(['sync', '--workspace', root, '--agent', 'copilot', '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).applied).toContain('.github/instructions/rule-cli.instructions.md');
+    await run(['sync', '--workspace', root, '--agent', 'copilot', '--check', '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).drift).toBe(false);
+
+    await writeFile(target, 'Unmanaged changes\n');
+    await run(['sync', '--workspace', root, '--agent', 'copilot', '--check', '--json']);
+    expect(process.exitCode).toBe(1);
+    process.exitCode = 0;
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).blocked).toBe(true);
+
+    await run(['adopt', '.github/instructions/rule-cli.instructions.md', '--workspace', root, '--json']);
+    const adopted = JSON.parse(output.mock.calls.at(-1)?.[0] as string) as { backup?: string };
+    expect(adopted.backup).toBeDefined();
+    await expect(readFile(path.join(root, adopted.backup!), 'utf8')).resolves.toBe('Unmanaged changes\n');
+    await expect(readFile(target, 'utf8')).resolves.toContain('Keep the CLI safe.');
+  });
 });

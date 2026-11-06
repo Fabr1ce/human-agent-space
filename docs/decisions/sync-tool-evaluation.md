@@ -1,6 +1,6 @@
 # Sync Tool Evaluation
 
-**Status:** Evaluation complete; implementation direction awaits human approval
+**Status:** Approved — built-in adapters; `rulesync` is a format reference only
 
 **Date:** 2026-11-05
 
@@ -22,8 +22,8 @@ adopt command.
 minimal built-in Copilot and Claude Code adapters and sync engine already
 required by TASK-2.2–2.5, using `rulesync` as a reference for target formats.
 Keep HAS responsible for plan-before-write, explicit adoption, drift reporting,
-and preserving hand-authored files. This is a recommendation, not authorization
-to start implementation; ADR-006 requires human approval first.
+and preserving hand-authored files. The human approved this direction on
+2026-11-05; ADR-006 records the approval.
 
 ## Comparison
 
@@ -56,14 +56,16 @@ Source snapshots were inspected from these repository HEADs:
   - [`README.md`](https://github.com/intellectronica/ruler/blob/5e551e60952fb1c81c6c5ad6f5fe8b7a412bda87/README.md): Beta Research Preview status, target support, dry-run, backup and revert options.
   - [`src/agents/AgentsMdAgent.ts`](https://github.com/intellectronica/ruler/blob/5e551e60952fb1c81c6c5ad6f5fe8b7a412bda87/src/agents/AgentsMdAgent.ts), [`src/agents/AbstractAgent.ts`](https://github.com/intellectronica/ruler/blob/5e551e60952fb1c81c6c5ad6f5fe8b7a412bda87/src/agents/AbstractAgent.ts), and [`src/core/revert-engine.ts`](https://github.com/intellectronica/ruler/blob/5e551e60952fb1c81c6c5ad6f5fe8b7a412bda87/src/core/revert-engine.ts): generated marker, backup/write behavior and provenance-aware revert.
 
-An attempted GitHub API metadata check was blocked by the environment's
-permission gate. It was not a user-initiated denial. Repository source retrieval
-and package metadata inspection succeeded, so the comparison above is based on
-the inspected source and package files; no candidate was executed.
+The supplemental authenticated GitHub API metadata retry returned `401 Bad
+credentials`. This indicates unavailable/invalid API credentials, not a denial
+by the human reviewer. Repository source retrieval and package metadata
+inspection succeeded, so the comparison above is based on those inspected files;
+no candidate was executed. No manual-approval control is exposed by the
+available tools.
 
-## Decision required
+## Decision recorded
 
-Choose whether to proceed with the recommendation (minimal built-in sync engine,
-using `rulesync` as a reference only), approve either candidate as a runtime
-dependency despite the safety gaps, or pause Phase 2. No sync engine code has
-been started.
+On 2026-11-05, the human approved proceeding with the recommendation: implement
+minimal built-in Copilot and Claude Code adapters, use `rulesync` only as a
+target-format reference, and add neither candidate as a runtime dependency.
+Implementation is recorded in ADR-006. No `rulesync` code is copied or invoked.

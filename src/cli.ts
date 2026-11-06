@@ -5,6 +5,9 @@ import yaml from 'js-yaml';
 import { createFileIfAbsent, isDirectory } from './core/files.js';
 import { fileExists, listRules, listSkills, validateKnowledge } from './core/knowledge.js';
 import { loadConfigAt, loadWorkspace, resolveWorkspace, type Scope } from './core/workspace.js';
+import { adoptWorkspaceFile, syncWorkspace } from './sync/engine.js';
+import type { AdapterId } from './adapters/types.js';
+import { listAdapters } from './adapters/registry.js';
 
 const workspaceDirectories = [
   'rules',
@@ -160,6 +163,54 @@ export function createProgram(): Command {
       }
     });
 
+  program
+    .command('sync')
+    .description('Project canonical rules and skills to supported coding agents')
+    .option('--workspace <path>', 'project root or explicit .has workspace path')
+    .option('--agent <id>', 'target one agent: copilot or claude-code')
+    .option('--dry-run', 'show planned changes without writing')
+    .option('--check', 'check for drift without writing; exits non-zero when changes are needed')
+    .option('--json', 'output machine-readable JSON')
+    .action(async (options: SyncOptions) => {
+      if (options.check && options.dryRun) {
+        throw new Error('Use either --check or --dry-run, not both');
+      }
+      const agent = parseAdapterId(options.agent);
+      const roots = resolveWorkspace(process.cwd(), undefined, options.workspace);
+      const report = await syncWorkspace(roots, listAdapters(), {
+        agent,
+        dryRun: options.dryRun,
+        check: options.check,
+        onPlan: options.json ? undefined : (operations) => printSyncPlan(operations),
+      });
+      printResult(report, options.json, formatSyncReport);
+      if ((options.check && report.drift) || report.blocked) {
+        process.exitCode = 1;
+      }
+    });
+
+  program
+    .command('adopt <generated-file>')
+    .description('Explicitly replace a conflicting agent file after backing it up locally')
+    .option('--workspace <path>', 'project root or explicit .has workspace path')
+    .option('--dry-run', 'show the adoption plan without writing')
+    .option('--json', 'output machine-readable JSON')
+    .action(async (generatedFile: string, options: AdoptOptions) => {
+      const roots = resolveWorkspace(process.cwd(), undefined, options.workspace);
+      const report = await adoptWorkspaceFile(
+        roots,
+        generatedFile,
+        listAdapters(),
+        options.dryRun,
+        undefined,
+        options.json ? undefined : (operations) => printSyncPlan(operations),
+      );
+      printResult(report, options.json, formatSyncReport);
+      if (report.blocked) {
+        process.exitCode = 1;
+      }
+    });
+
   return program;
 }
 
@@ -173,6 +224,16 @@ interface InitOptions {
 interface WorkspaceOptions {
   workspace?: string;
   json?: boolean;
+}
+
+interface SyncOptions extends WorkspaceOptions {
+  agent?: string;
+  dryRun?: boolean;
+  check?: boolean;
+}
+
+interface AdoptOptions extends WorkspaceOptions {
+  dryRun?: boolean;
 }
 
 interface DoctorCheck {
@@ -373,6 +434,53 @@ async function collectDirectories(root: string): Promise<Record<string, boolean>
 
 function printResult<T>(value: T, json: boolean | undefined, text: (value: T) => string): void {
   console.log(json ? JSON.stringify(value, null, 2) : text(value));
+}
+
+function parseAdapterId(value: string | undefined): AdapterId | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const adapter = listAdapters().find((candidate) => candidate.id === value);
+  if (adapter) {
+    return adapter.id;
+  }
+  throw new Error(`Unknown agent "${value}". Supported agents: ${listAdapters().map(({ id }) => id).join(', ')}`);
+}
+
+function printSyncPlan(operations: Array<{ action: string; path: string; source?: string; reason?: string }>): void {
+  console.log('Sync plan:');
+  if (!operations.length) {
+    console.log('  no files to sync');
+    return;
+  }
+  for (const operation of operations) {
+    const source = operation.source ? ` <- ${operation.source}` : '';
+    const reason = operation.reason ? ` (${operation.reason})` : '';
+    console.log(`  ${operation.action.toUpperCase()} ${operation.path}${source}${reason}`);
+  }
+}
+
+function formatSyncReport(report: {
+  operations: Array<{ action: string; path: string; reason?: string }>;
+  drift: boolean;
+  blocked: boolean;
+  applied: string[];
+  backup?: string;
+}): string {
+  const summary = report.blocked
+    ? 'Sync blocked by conflicts; no files were changed.'
+    : report.applied.length
+      ? `Applied ${report.applied.length} file operation(s).`
+      : report.drift
+        ? 'Changes are required.'
+        : 'Workspace is up to date.';
+  return [
+    summary,
+    ...report.operations.map((operation) =>
+      `${operation.action.toUpperCase()} ${operation.path}${operation.reason ? `: ${operation.reason}` : ''}`,
+    ),
+    ...(report.backup ? [`Backup: ${report.backup}`] : []),
+  ].join('\n');
 }
 
 function isNotFound(error: unknown): boolean {

@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://human-agent-space.dev/schemas/sync-manifest.schema.json",
+  "title": "Human-Agent Space sync manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "files"],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["agent", "source", "output_hash"],
+        "properties": {
+          "agent": {
+            "enum": ["copilot", "claude-code"]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "output_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

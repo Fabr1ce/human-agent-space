@@ -22,6 +22,18 @@ project entries taking precedence over global entries with the same ID or name.
 The CLI never executes skill scripts. Agent trust state must be verified in the
 agent itself.
 
-The initial release is scoped to workspace setup and content inspection. The
-adapter sync phase is a separate step, gated on an evaluation of existing sync
-tools.
+Project rules and skills can be synchronized to GitHub Copilot and Claude Code:
+
+```sh
+has sync --dry-run
+has sync
+has sync --check
+has sync --agent copilot
+has adopt .github/instructions/rule-style.instructions.md
+```
+
+Sync previews each operation and preserves existing hand-authored files. If a
+target conflicts, `has adopt <path>` explicitly takes it over after saving a
+local backup under `.has/.local/sync-backups/`. See
+[`docs/ADAPTERS.md`](docs/ADAPTERS.md) for target formats, verification limits,
+and why `rulesync` informed the adapter formats but is not a runtime dependency.

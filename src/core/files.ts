@@ -20,7 +20,10 @@ export async function readFrontmatter(filePath: string): Promise<FrontmatterDocu
   return { data: parsed.data as Record<string, unknown>, content: parsed.content };
 }
 
-export async function atomicWriteFile(filePath: string, content: string): Promise<void> {
+export async function atomicWriteFile(
+  filePath: string,
+  content: string | Uint8Array,
+): Promise<void> {
   const directory = path.dirname(filePath);
   await mkdir(directory, { recursive: true });
   const temporaryPath = path.join(directory, `.${path.basename(filePath)}.${randomUUID()}.tmp`);
@@ -30,7 +33,7 @@ export async function atomicWriteFile(filePath: string, content: string): Promis
   try {
     handle = await open(temporaryPath, 'wx', 0o600);
     ownsTemporary = true;
-    await handle.writeFile(content, 'utf8');
+    await handle.writeFile(content);
     await handle.sync();
     await handle.close();
     handle = undefined;
