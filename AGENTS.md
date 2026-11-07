@@ -34,3 +34,9 @@
   coverage-threshold checks on every pull request open, update/synchronize, or
   reopen, and on each commit pushed to a pull-request branch. Keep CI aligned
   with the local project checks above.
+
+## Documentation
+
+- Keep documentation concise, clear, and friendly to readers who are new to
+  HAS. Prefer practical steps and plain language; explain why a feature matters
+  without unnecessary detail or jargon.
