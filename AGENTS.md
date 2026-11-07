@@ -30,3 +30,7 @@
 
 - Run `npm run build`, `npm test`, and `npm run test:coverage` for code changes.
 - Keep TypeScript strict and follow existing project patterns.
+- Maintain a GitHub Actions workflow that runs the same build, unit-test, and
+  coverage-threshold checks on every pull request open, update/synchronize, or
+  reopen, and on each commit pushed to a pull-request branch. Keep CI aligned
+  with the local project checks above.
