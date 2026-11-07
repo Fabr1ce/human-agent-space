@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -245,6 +246,31 @@ describe('sync planning and apply', () => {
     await mkdir(path.join(roots.projectRoot!, '.local'), { recursive: true });
     await writeFile(path.join(roots.projectRoot!, '.local/sync-manifest.json'), '{not-json');
     await expect(syncWorkspace(roots, listAdapters(), { agent: 'copilot' })).rejects.toThrow('invalid JSON');
+  });
+
+  it('rejects manifest paths outside adapter output roots before deleting stale entries', async () => {
+    const roots = await makeWorkspace();
+    const protectedFile = path.join(roots.repositoryRoot!, 'README.md');
+    const protectedContents = 'Keep this project file.\n';
+    await writeFile(protectedFile, protectedContents);
+    await mkdir(path.join(roots.projectRoot!, '.local'), { recursive: true });
+    await writeFile(
+      path.join(roots.projectRoot!, '.local/sync-manifest.json'),
+      JSON.stringify({
+        schema_version: 1,
+        files: {
+          'README.md': {
+            agent: 'copilot',
+            source: '.has/rules/retired.md',
+            output_hash: createHash('sha256').update(protectedContents).digest('hex'),
+          },
+        },
+      }),
+    );
+
+    await expect(syncWorkspace(roots, listAdapters(), { agent: 'copilot' }))
+      .rejects.toThrow('Invalid sync manifest path for copilot: README.md');
+    await expect(readFile(protectedFile, 'utf8')).resolves.toBe(protectedContents);
   });
 
   it('rejects symlinked output paths instead of writing outside the repository', async () => {

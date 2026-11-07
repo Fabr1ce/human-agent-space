@@ -225,6 +225,7 @@ async function createPlan(
   await assertSafePath(repositoryRoot, manifestRelative);
   const loadedManifest = await readManifest(manifestPath);
   const manifest = loadedManifest.manifest;
+  validateManifestPaths(manifest);
   const selectedAdapters = adapters.filter((adapter) => !onlyAgent || adapter.id === onlyAgent);
   const generated = (await Promise.all(selectedAdapters.map((adapter) => adapter.project(roots)))).flat();
   const desired = new Map<string, GeneratedFile>();
@@ -318,6 +319,36 @@ async function createPlan(
     originalManifest: manifest,
     nextManifest: { schema_version: 1, files: nextFiles },
   };
+}
+
+function validateManifestPaths(manifest: SyncManifest): void {
+  for (const [filePath, entry] of Object.entries(manifest.files)) {
+    let normalizedPath: string;
+    try {
+      normalizedPath = normalizeRelativePath(filePath);
+    } catch (error) {
+      throw new Error(`Invalid sync manifest path "${filePath}": ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (normalizedPath !== filePath || !isAdapterOutputPath(entry.agent, normalizedPath)) {
+      throw new Error(`Invalid sync manifest path for ${entry.agent}: ${filePath}`);
+    }
+  }
+}
+
+function isAdapterOutputPath(agent: AdapterId, filePath: string): boolean {
+  const rulePath = agent === 'copilot'
+    ? /^\.github\/instructions\/rule-[A-Za-z0-9._-]+\.instructions\.md$/
+    : /^\.claude\/rules\/rule-[A-Za-z0-9._-]+\.md$/;
+  if (rulePath.test(filePath)) {
+    return true;
+  }
+
+  const skillRoot = agent === 'copilot' ? '.github/skills/' : '.claude/skills/';
+  if (!filePath.startsWith(skillRoot)) {
+    return false;
+  }
+  const segments = filePath.slice(skillRoot.length).split('/');
+  return segments.length >= 2 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(segments[0] ?? '');
 }
 
 async function applyPlan(plan: InternalPlan): Promise<void> {
