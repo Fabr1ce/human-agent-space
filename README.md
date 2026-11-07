@@ -53,9 +53,11 @@ has sync
 
 Review the dry-run plan, then sync to generate project files for GitHub Copilot
 and Claude Code. `has sync --check` checks whether generated files have drifted.
-Existing hand-written or edited target files are preserved as conflicts; use
-`has adopt <path>` only when you explicitly want HAS to replace one. It saves a
-local backup first.
+If any target conflicts with a hand-written or edited file, HAS preserves it
+and applies **none** of that sync plan. Resolve conflicts, then rerun sync.
+Before adopting a file, copy any edits you want to keep into the canonical
+`.has/rules/` or `.has/skills/` source: `has adopt <path>` replaces only that
+target, saves a local backup, and does not merge its edits back into HAS.
 
 Project knowledge overrides global knowledge with the same rule ID or skill
 name. Temporary runtime data is kept under `.has/.local/` and gitignored.
