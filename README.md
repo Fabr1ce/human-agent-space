@@ -9,6 +9,22 @@ HAS helps when you switch between agents, work across several projects, or want
 to preserve shared team guidance. It does not replace your normal editor, agent,
 or workflow; you can keep working as usual and adopt HAS incrementally.
 
+## How it fits together
+
+```mermaid
+flowchart LR
+  person["You maintain guidance"] --> canonical["HAS rules and skills"]
+  global["Optional global guidance"] --> combine["HAS combines guidance<br/>project entries take precedence"]
+  canonical --> combine
+  combine --> preview["Review sync plan"]
+  preview --> decision{"Any conflicts?"}
+  decision -- No --> generated["Generated Copilot and Claude files"]
+  generated --> agents["Your coding agents"]
+  decision -- Yes --> preserved["Keep existing files; apply no changes"]
+  preserved --> resolve["Resolve conflicts or explicitly adopt"]
+  resolve --> generated
+```
+
 ## Get started
 
 Requires Node.js 22 or newer.
