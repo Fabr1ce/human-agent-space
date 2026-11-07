@@ -14,7 +14,7 @@ or workflow; you can keep working as usual and adopt HAS incrementally.
 ```mermaid
 flowchart LR
   person["You maintain guidance"] --> project["Project rules and skills"]
-  global["Optional global guidance"] --> combine["HAS combines guidance<br/>project entries take precedence"]
+  global["Optional global rules and skills"] --> combine["HAS combines guidance<br/>matching project entries take precedence"]
   project --> combine
   combine --> preview["Review sync plan"]
   preview --> decision{"Any conflicts?"}
