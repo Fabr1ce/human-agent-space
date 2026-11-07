@@ -13,16 +13,16 @@ or workflow; you can keep working as usual and adopt HAS incrementally.
 
 ```mermaid
 flowchart LR
-  person["You maintain guidance"] --> canonical["HAS rules and skills"]
+  person["You maintain guidance"] --> project["Project rules and skills"]
   global["Optional global guidance"] --> combine["HAS combines guidance<br/>project entries take precedence"]
-  canonical --> combine
+  project --> combine
   combine --> preview["Review sync plan"]
   preview --> decision{"Any conflicts?"}
   decision -- No --> generated["Generated Copilot and Claude files"]
   generated --> agents["Your coding agents"]
   decision -- Yes --> preserved["Keep existing files; apply no changes"]
-  preserved --> resolve["Resolve conflicts or explicitly adopt"]
-  resolve --> generated
+  preserved --> resolve["Resolve conflicts, or adopt one target"]
+  resolve --> preview
 ```
 
 ## Get started
