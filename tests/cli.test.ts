@@ -24,6 +24,24 @@ async function run(args: string[]): Promise<void> {
   await program.parseAsync(['node', 'has', ...args]);
 }
 
+async function writeRule(root: string, id = 'rule-cli'): Promise<void> {
+  const directory = path.join(root, '.has', 'rules');
+  await mkdir(directory, { recursive: true });
+  await writeFile(
+    path.join(directory, `${id}.md`),
+    `---\nschema_version: 1\nid: ${id}\ndescription: CLI test rule\nscope: project\npriority: 1\nglobs: [\"src/**/*.ts\"]\nauthor: human\n---\nKeep the CLI safe.\n`,
+  );
+}
+
+async function writeSkill(root: string, name = 'cli-skill'): Promise<void> {
+  const directory = path.join(root, '.has', 'skills', name);
+  await mkdir(directory, { recursive: true });
+  await writeFile(
+    path.join(directory, 'SKILL.md'),
+    `---\nschema_version: 1\nname: ${name}\ndescription: CLI test skill\nversion: 1.0.0\ncompatibility: [copilot, claude-code]\ntags: [testing]\nauthor: human\n---\nUse this test skill.\n`,
+  );
+}
+
 describe('CLI', () => {
   it('initializes a project idempotently and adds a local-data ignore rule', async () => {
     const root = await makeTemporaryDirectory();
@@ -83,6 +101,83 @@ describe('CLI', () => {
 
     expect(report.status).toBe('WARN');
     expect(report.checks.find((check) => check.name === 'agent trust')?.status).toBe('WARN');
+  });
+
+  it('lists, shows, and validates rules and skills as JSON', async () => {
+    const root = await makeTemporaryDirectory();
+    await writeRule(root);
+    await writeSkill(root);
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    await run(['rules', 'list', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string)).toEqual([
+      expect.objectContaining({ id: 'rule-cli', description: 'CLI test rule' }),
+    ]);
+    await run(['rules', 'show', 'rule-cli', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).document).toContain('Keep the CLI safe.');
+    await run(['rules', 'validate', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string)[0].valid).toBe(true);
+
+    await run(['skills', 'list', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string)).toEqual([
+      expect.objectContaining({ name: 'cli-skill', description: 'CLI test skill' }),
+    ]);
+    await run(['skills', 'show', 'cli-skill', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).document).toContain('Use this test skill.');
+    await run(['skills', 'validate', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string)[0].valid).toBe(true);
+  });
+
+  it('handles empty knowledge listings, missing items, and invalid knowledge', async () => {
+    const root = await makeTemporaryDirectory();
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    await run(['rules', 'list', '--workspace', root]);
+    expect(output.mock.calls.at(-1)?.[0]).toBe('No rules found.');
+    await run(['skills', 'list', '--workspace', root]);
+    expect(output.mock.calls.at(-1)?.[0]).toBe('No skills found.');
+    await expect(run(['rules', 'show', 'missing', '--workspace', root])).rejects.toThrow('Rule "missing" was not found');
+    await expect(run(['skills', 'show', 'missing', '--workspace', root])).rejects.toThrow('Skill "missing" was not found');
+
+    await writeRule(root);
+    await writeFile(path.join(root, '.has', 'rules', 'rule-invalid.md'), 'not valid frontmatter');
+    await run(['rules', 'validate', '--workspace', root, '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).some((entry: { valid: boolean }) => !entry.valid)).toBe(true);
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('reports invalid project configuration and missing ignore setup in doctor output', async () => {
+    const root = await makeTemporaryDirectory();
+    await mkdir(path.join(root, '.has'), { recursive: true });
+    await writeFile(path.join(root, '.has', 'config.yaml'), 'schema_version: invalid\n');
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    await run(['doctor', '--workspace', root, '--json']);
+
+    const report = JSON.parse(output.mock.calls.at(-1)?.[0] as string) as {
+      status: string;
+      checks: Array<{ name: string; status: string }>;
+    };
+    expect(report.status).toBe('FAIL');
+    expect(report.checks.find((check) => check.name === 'project config')?.status).toBe('FAIL');
+    expect(report.checks.find((check) => check.name === '.local gitignore')?.status).toBe('FAIL');
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('prints human-readable status and empty sync plans', async () => {
+    const root = await makeTemporaryDirectory();
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    await run(['init', '--workspace', root]);
+    await run(['status', '--workspace', root]);
+    expect(output.mock.calls.at(-1)?.[0]).toContain(`Project: ${path.join(root, '.has')}`);
+    await run(['sync', '--workspace', root]);
+    expect(output.mock.calls.join('\n')).toContain('no files to sync');
+  });
+
+  it('rejects invalid sync options and unsupported agents', async () => {
+    const root = await makeTemporaryDirectory();
+    await expect(run(['sync', '--workspace', root, '--dry-run', '--check']))
+      .rejects.toThrow('Use either --check or --dry-run, not both');
+    await expect(run(['sync', '--workspace', root, '--agent', 'unknown']))
+      .rejects.toThrow('Unknown agent "unknown"');
   });
 
   it('supports sync preview, apply, drift checks, and explicit adoption in JSON mode', async () => {
