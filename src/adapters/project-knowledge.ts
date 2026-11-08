@@ -31,6 +31,10 @@ export async function projectKnowledge(
     const frontmatter: Record<string, unknown> = {
       ...(agent === 'copilot'
         ? { applyTo: rule.globs.length ? rule.globs.join(', ') : '**' }
+        : agent === 'kiro'
+          ? rule.globs.length
+            ? { inclusion: 'fileMatch', fileMatchPattern: rule.globs }
+            : { inclusion: 'always' }
         : rule.globs.length
           ? { paths: rule.globs }
           : {}),
@@ -90,9 +94,12 @@ export async function projectKnowledge(
 }
 
 function skillRootFor(agent: AdapterId, name: string): string {
-  return agent === 'copilot'
-    ? path.posix.join('.github', 'skills', name)
-    : path.posix.join('.claude', 'skills', name);
+  const root = {
+    copilot: '.github',
+    'claude-code': '.claude',
+    kiro: '.kiro',
+  }[agent];
+  return path.posix.join(root, 'skills', name);
 }
 
 async function assertCanonicalDirectories(roots: WorkspaceRoots): Promise<void> {

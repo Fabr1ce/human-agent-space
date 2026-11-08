@@ -167,7 +167,7 @@ export function createProgram(): Command {
     .command('sync')
     .description('Project canonical rules and skills to supported coding agents')
     .option('--workspace <path>', 'project root or explicit .has workspace path')
-    .option('--agent <id>', 'target one agent: copilot or claude-code')
+    .option('--agent <id>', 'target one agent: copilot, claude-code, or kiro')
     .option('--dry-run', 'show planned changes without writing')
     .option('--check', 'check for drift without writing; exits non-zero when changes are needed')
     .option('--json', 'output machine-readable JSON')

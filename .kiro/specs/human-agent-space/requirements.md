@@ -18,18 +18,18 @@ first release. The **MVP** is limited to:
 
 - Global and project workspace initialization, configuration, status, and doctor.
 - Canonical human-authored rules and skills, with list/show/validate commands.
-- A safe, reviewable sync workflow for **GitHub Copilot and Claude Code only**.
+- A safe, reviewable sync workflow for **GitHub Copilot, Claude Code, and Kiro**.
 - JSON output, dry-run planning, drift detection, and preservation of hand-authored
   agent configuration for those workflows.
 
 The MVP succeeds when a developer can initialize a workspace, define a rule and a
-skill once, preview and sync them to both supported agents without overwriting
+skill once, preview and sync them to the supported agents without overwriting
 hand-authored files, and detect subsequent drift. Requirements for memory, context
 assembly, tasks, MCP, import/export, auditing, and usage tracking are roadmap scope
 and MUST NOT expand the MVP.
 
 For MVP conformance, implement REQ-1.1–1.8, REQ-2.1–2.4, REQ-3.1–3.4,
-REQ-4.1–4.3 and REQ-4.5–4.6, REQ-7.1–7.10 for the two named adapters only, REQ-9.3 and REQ-9.7,
+REQ-4.1–4.3 and REQ-4.5–4.6, REQ-7.1–7.10 for the three named adapters only, REQ-9.3 and REQ-9.7,
 and REQ-12.2–12.5. Requirements not listed here are post-MVP, even where they use
 MUST language.
 
@@ -110,7 +110,7 @@ workspace directory.
 - **REQ-7.6** Generated agent configuration files MUST have a clear header identifying them as generated and pointing to the canonical source.
 - **REQ-7.7** The system MUST NEVER silently overwrite hand-authored agent configuration.
 - **REQ-7.8** Direct edits to generated files MUST be detected and surfaced to the user.
-- **REQ-7.9** The MVP MUST support GitHub Copilot and Claude Code adapters. Additional adapter candidates, in roadmap priority order, are Kiro, Cursor, Agy (formerly Gemini CLI), Aider, and OpenAI Codex.
+- **REQ-7.9** The MVP MUST support GitHub Copilot, Claude Code, and Kiro adapters. Additional adapter candidates, in roadmap priority order, are Cursor, Agy (formerly Gemini CLI), Aider, and OpenAI Codex.
 - **REQ-7.10** Adapter capabilities MUST be recorded in `docs/ADAPTERS.md` with verified/partially-verified/unverified status.
 
 ### 8. Collaboration and Task Management

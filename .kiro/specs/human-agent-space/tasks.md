@@ -106,14 +106,14 @@ criteria pass.
 - **Acceptance:** Rules and skills project to the documented Claude Code formats; behavior is verified against documented support; fixture tests pass; ADAPTERS.md entry is complete
 
 ### TASK-2.4 Shared sync engine and built-in adapter registry
-- After TASK-2.2 and TASK-2.3, extract only the common adapter contract and registry required by these two verified implementations
+- After TASK-2.2 and TASK-2.3, extract only the common adapter contract and registry required by the verified implementations
 - Implement `SyncPlanner` — produces a `SyncPlan` describing every intended file operation
 - Implement `SyncApplier` — executes a plan; reports what changed
 - Implement `DriftChecker` — compares generated files to canonical source; returns `DriftReport`
 - `sync --dry-run` must not write; `sync --check` must return non-zero on drift
 - Generated files get a header comment pointing to canonical source
 - Do not implement dynamic third-party plugin discovery or loading
-- **Acceptance:** Contract/registry tests use both adapters; idempotency, dry-run no-write, drift detection, and hand-authored file preservation tests pass
+- **Acceptance:** Contract/registry tests use both initial adapters; idempotency, dry-run no-write, drift detection, and hand-authored file preservation tests pass
 
 ### TASK-2.5 `has sync` and `has adopt` CLI commands (MVP)
 - `has sync [--agent <id>] [--dry-run]`
@@ -122,13 +122,15 @@ criteria pass.
 - Support `--json` output
 - **Acceptance:** CLI integration tests for each mode; exit code is non-zero on drift
 
-The following adapter tasks are post-MVP backlog and require a later scope decision:
+### TASK-2.6 Kiro adapter (approved addition)
+- Implement the Kiro `AgentAdapter` using documented workspace steering and native skill formats
+- Map empty rule globs to `inclusion: always`; map non-empty globs to `inclusion: fileMatch` and `fileMatchPattern`
+- Document that workspace MCP servers use `.kiro/settings/mcp.json` and are not managed by the rules/skills sync adapter
+- Implement fixture tests for plan, apply, check, adopt, rule inclusion modes, skill assets, and CLI targeting
+- Record official references and verification status in `docs/ADAPTERS.md`
+- **Acceptance:** `has sync --agent kiro` safely syncs rules and skills to `.kiro/steering/` and `.kiro/skills/`; dry-run, drift, conflict preservation, and adoption tests pass; MCP boundary and Kiro formats are documented
 
-### TASK-2.6 Kiro adapter
-- Research and document Kiro instruction file paths, skill discovery, MCP config method
-- Implement `KiroAdapter`
-- Record findings in `docs/ADAPTERS.md` with verified/unverified status
-- **Acceptance:** Fixture-based tests for plan, apply, check, adopt; ADAPTERS.md entry complete
+The following adapter tasks remain post-MVP backlog and require a later scope decision:
 
 ### TASK-2.7 Cursor adapter
 - Research and document Cursor instruction file paths and MCP config method
@@ -422,6 +424,6 @@ until the MVP is evaluated and a new phase plan is approved.
 - Depends on: post-MVP import support (TASK-8.2) and migration design review
 
 ### TASK-F.6 External adapter plugin investigation
-- Evaluate a documented extension API and safe loading model after the two built-in MVP adapters are verified
+- Evaluate a documented extension API and safe loading model after the three built-in MVP adapters are verified
 - Do not load plugins or execute third-party adapter code without a separate approved design
 - **Acceptance:** Recommendation covers trust boundary, compatibility/versioning, installation, and failure isolation; no implementation is implied

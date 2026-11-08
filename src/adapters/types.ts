@@ -2,7 +2,7 @@ import type { WorkspaceRoots } from '../core/workspace.js';
 import type { ApplyOptions, SyncReport, SyncPlan } from '../sync/engine.js';
 import type { AdoptReport } from '../sync/engine.js';
 
-export type AdapterId = 'copilot' | 'claude-code';
+export type AdapterId = 'copilot' | 'claude-code' | 'kiro';
 
 export interface GeneratedFile {
   agent: AdapterId;

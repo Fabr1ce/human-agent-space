@@ -1,8 +1,9 @@
 # Built-in Agent Adapters
 
-The MVP projects canonical `.has/rules/` and `.has/skills/` content to GitHub
-Copilot and Claude Code. Project-specific entries override global entries with
-the same rule ID or skill name. Sync never executes skill scripts or resources.
+HAS projects canonical `.has/rules/` and `.has/skills/` content to GitHub
+Copilot, Claude Code, and Kiro. Project-specific entries override global
+entries with the same rule ID or skill name. Sync never executes skill scripts
+or resources.
 
 ## GitHub Copilot
 
@@ -20,6 +21,31 @@ Official references:
 
 - [Adding repository custom instructions](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions)
 - [Agent skills](https://docs.github.com/en/copilot/concepts/customizations/agent-skills)
+
+## Kiro
+
+**Verification:** Verified against Kiro's current steering and skills
+documentation for workspace file formats and discovery. This does not verify a
+specific installed Kiro surface or version.
+
+| Canonical content | Project output | Projection |
+|---|---|---|
+| Rule | `.kiro/steering/<rule-id>.md` | Rules without globs use `inclusion: always`. Rules with globs use `inclusion: fileMatch` and `fileMatchPattern` with the canonical patterns. |
+| Skill | `.kiro/skills/<name>/SKILL.md` | Native Agent Skills `name` and `description` are emitted; HAS-specific metadata is retained under `metadata`. Other regular files in the skill directory are copied byte-for-byte. |
+
+HAS syncs both global and project canonical guidance into the target
+repository's `.kiro/` workspace. Kiro gives workspace skills precedence over
+global skills; HAS resolves same-name project/global entries before emitting a
+single workspace skill. HAS does not write to `~/.kiro/`, configure Kiro MCP
+servers, or modify Kiro agent resources. Kiro's documented workspace MCP
+configuration file is `.kiro/settings/mcp.json`; configuring it is outside
+this rules-and-skills adapter.
+
+Official references:
+
+- [Kiro steering](https://kiro.dev/docs/steering/)
+- [Kiro skills](https://kiro.dev/docs/skills/)
+- [Kiro MCP configuration](https://kiro.dev/docs/mcp/configuration/)
 
 ## Claude Code
 

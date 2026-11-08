@@ -86,22 +86,22 @@ alternatives considered, and consequences.
 
 ---
 
-## ADR-005 — MVP adapters: GitHub Copilot and Claude Code
+## ADR-005 — Initial MVP adapters: GitHub Copilot and Claude Code
 
-**Status:** Accepted  
+**Status:** Superseded by ADR-009
 **Date:** 2026-11-03  
 **Decided by:** Human (updated 2026-11-05)
 
-**Decision:** The MVP supports GitHub Copilot and Claude Code only. Kiro, Cursor,
-Agy (formerly Gemini CLI), Aider, and OpenAI Codex are roadmap candidates, not MVP
-commitments.
+**Decision:** The initial MVP adapter scope was GitHub Copilot and Claude Code.
+Kiro, Cursor, Agy (formerly Gemini CLI), Aider, and OpenAI Codex were initially
+roadmap candidates.
 
 **Rationale:** Validate the canonical workspace and safe sync workflow with two
 concrete adapters before expanding coverage.
 
-**Consequences:** Only Copilot and Claude Code are in the MVP adapter phase. Any
-future adapter whose behavior cannot be verified from official documentation must
-be marked `UNVERIFIED` in `docs/ADAPTERS.md` and in code.
+**Consequences:** Superseded by ADR-009, which adds Kiro to the built-in adapter
+scope. Any adapter whose behavior cannot be verified from official documentation
+must be marked with its verification status in `docs/ADAPTERS.md` and in code.
 
 ---
 
@@ -149,9 +149,10 @@ copy their implementation code.
 **Decided by:** Human
 
 **Decision:** The first release is limited to workspace setup, canonical rules and
-skills, and safe synchronization to GitHub Copilot and Claude Code. The MVP uses
-built-in adapter modules only. External adapter plugin loading is a roadmap
-investigation after both built-in adapters are verified; it is not part of the MVP.
+skills, and safe synchronization to GitHub Copilot, Claude Code, and Kiro. The
+MVP uses built-in adapter modules only. External adapter plugin loading is a
+roadmap investigation after all three built-in adapters are verified; it is not
+part of the MVP.
 
 **Rationale:** A narrow end-to-end release tests the product's core value before
 committing to the cost and trust surface of a broad feature set or third-party code
@@ -162,3 +163,25 @@ adapters, and plugin loading are not authorized by the MVP plan. Any roadmap pha
 requires a separate human-approved scope and acceptance criteria. The plugin
 investigation must address trust, compatibility, installation, and failure
 isolation before implementation is proposed.
+
+---
+
+## ADR-009 — Add Kiro to built-in sync adapters
+
+**Status:** Accepted
+**Date:** 2026-11-08
+**Decided by:** Human
+
+**Decision:** Add Kiro workspace steering and skills as a built-in sync target
+alongside Copilot and Claude Code. Emit rules under `.kiro/steering/` and skills
+under `.kiro/skills/`; continue to write only into the project repository.
+
+**Rationale:** Kiro provides documented workspace steering and portable skills,
+allowing HAS to project canonical rules and skills into another agent format
+using the existing safe sync engine.
+
+**Consequences:** Rules without globs use Kiro's `always` inclusion; rules with
+globs use `fileMatch` and `fileMatchPattern`. HAS does not configure Kiro MCP
+servers or write global `~/.kiro/` files. Kiro's workspace MCP configuration is
+`.kiro/settings/mcp.json` and is outside this adapter. The original ADR-005 is
+superseded.

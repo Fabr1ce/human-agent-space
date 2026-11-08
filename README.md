@@ -20,7 +20,7 @@ flowchart LR
   project --> combine
   combine --> preview["Review sync plan"]
   preview --> decision{"Any conflicts?"}
-  decision -- No --> generated["Generated Copilot and Claude files"]
+  decision -- No --> generated["Generated Copilot, Claude, and Kiro files"]
   generated --> agents["Your coding agents"]
   decision -- Yes --> preserved["Keep existing files; apply no changes"]
   preserved --> resolve["Resolve conflicts, or adopt one target"]
@@ -79,9 +79,10 @@ node "$HAS" sync --dry-run --workspace "$PWD"
 node "$HAS" sync --workspace "$PWD"
 ```
 
-Review the dry-run plan, then sync to generate project files for GitHub Copilot
-and Claude Code. `node "$HAS" sync --check --workspace "$PWD"` checks whether
-generated files have drifted.
+Review the dry-run plan, then sync to generate project files for GitHub Copilot,
+Claude Code, and Kiro. Use `--agent kiro` to target Kiro alone.
+`node "$HAS" sync --check --workspace "$PWD"` checks whether generated files
+have drifted.
 If any target conflicts with a hand-written or edited file, HAS preserves it
 and applies **none** of that sync plan. Resolve conflicts, then rerun sync.
 Before adopting a file, copy any edits you want to keep into the canonical

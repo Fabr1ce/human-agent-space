@@ -336,14 +336,22 @@ function validateManifestPaths(manifest: SyncManifest): void {
 }
 
 function isAdapterOutputPath(agent: AdapterId, filePath: string): boolean {
-  const rulePath = agent === 'copilot'
-    ? /^\.github\/instructions\/rule-[A-Za-z0-9._-]+\.instructions\.md$/
-    : /^\.claude\/rules\/rule-[A-Za-z0-9._-]+\.md$/;
+  const rulePaths: Record<AdapterId, RegExp> = {
+    copilot: /^\.github\/instructions\/rule-[A-Za-z0-9._-]+\.instructions\.md$/,
+    'claude-code': /^\.claude\/rules\/rule-[A-Za-z0-9._-]+\.md$/,
+    kiro: /^\.kiro\/steering\/rule-[A-Za-z0-9._-]+\.md$/,
+  };
+  const rulePath = rulePaths[agent];
   if (rulePath.test(filePath)) {
     return true;
   }
 
-  const skillRoot = agent === 'copilot' ? '.github/skills/' : '.claude/skills/';
+  const skillRoots: Record<AdapterId, string> = {
+    copilot: '.github/skills/',
+    'claude-code': '.claude/skills/',
+    kiro: '.kiro/skills/',
+  };
+  const skillRoot = skillRoots[agent];
   if (!filePath.startsWith(skillRoot)) {
     return false;
   }

@@ -17,7 +17,7 @@
         "required": ["agent", "source", "output_hash"],
         "properties": {
           "agent": {
-            "enum": ["copilot", "claude-code"]
+            "enum": ["copilot", "claude-code", "kiro"]
           },
           "source": {
             "type": "string",

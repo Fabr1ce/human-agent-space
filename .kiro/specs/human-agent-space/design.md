@@ -513,7 +513,7 @@ Findings block the write and return structured errors. The scanner does not clai
 | Phase | Scope | Key Deliverables |
 |---|---|---|
 | **1 (MVP)** | Workspace foundation, rules, and skills | `.has/` layout, config + schemas, init/status/doctor, canonical rules and skills with list/show/validate, atomic file operations, CLI skeleton, test harness |
-| **2 (MVP)** | Two built-in adapters | Evaluate `rulesync`/`ruler`; safe plan/apply/check for GitHub Copilot and Claude Code; drift detection and adapter documentation |
+| **2 (MVP)** | Three built-in adapters | Evaluate `rulesync`/`ruler`; safe plan/apply/check for GitHub Copilot, Claude Code, and Kiro; drift detection and adapter documentation |
 | **Later, separately approved** | Product roadmap | Memory, context, collaboration/tasks, MCP, other built-in adapters, import/export, auditing, and production hardening; each requires a scoped plan and human approval after MVP evaluation |
 
 No phase beyond the MVP is authorized by this plan. Each approved phase requires
@@ -534,6 +534,6 @@ All decisions recorded in `decisions/ADRs.md`.
 | D-2 | Canonical project dir: `.human-agent-space/` or shorter (`.has/`)? | `.has/` ✓ |
 | D-3 | License: MIT, Apache 2.0, or other? | MIT ✓ |
 | D-4 | Compatibility path for existing `.agents/` directories? | `has import --from agents` only; auto-migration deferred to TASK-F.5 ✓ |
-| D-5 | Which adapters are in the MVP? | GitHub Copilot and Claude Code; Kiro, Cursor, Agy, Aider, and Codex are roadmap candidates ✓ |
+| D-5 | Which adapters are in the MVP? | GitHub Copilot, Claude Code, and Kiro; Cursor, Agy, Aider, and Codex are roadmap candidates ✓ |
 | D-6 | Evaluate `rulesync`/`ruler` before building custom sync engine? | Yes — TASK-2.1 is a hard gate before TASK-2.4 ✓ |
 | D-7 | Read-only local web view in Phase 7 scope? | No, deferred to TASK-F.4 ✓ |

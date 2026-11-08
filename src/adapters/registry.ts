@@ -1,5 +1,6 @@
 import { claudeCodeProjector } from './claude-code.js';
 import { copilotProjector } from './copilot.js';
+import { kiroProjector } from './kiro.js';
 import {
   adoptWorkspaceFile,
   applyWorkspaceSyncPlan,
@@ -12,6 +13,7 @@ import type { AdapterId, AdapterProjector, AgentAdapter } from './types.js';
 const projectors: Record<AdapterId, AdapterProjector> = {
   copilot: copilotProjector,
   'claude-code': claudeCodeProjector,
+  kiro: kiroProjector,
 };
 
 function register(projector: AdapterProjector): AgentAdapter {
@@ -28,6 +30,7 @@ function register(projector: AdapterProjector): AgentAdapter {
 const adapters: Record<AdapterId, AgentAdapter> = {
   copilot: register(projectors.copilot),
   'claude-code': register(projectors['claude-code']),
+  kiro: register(projectors.kiro),
 };
 
 export function getAdapter(id: AdapterId): AgentAdapter {

@@ -217,4 +217,30 @@ describe('CLI', () => {
     await expect(readFile(path.join(root, adopted.backup!), 'utf8')).resolves.toBe('Unmanaged changes\n');
     await expect(readFile(target, 'utf8')).resolves.toContain('Keep the CLI safe.');
   });
+
+  it('supports syncing to Kiro steering and skills', async () => {
+    const root = await makeTemporaryDirectory();
+    await writeRule(root);
+    await writeSkill(root);
+    const output = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    await run(['sync', '--workspace', root, '--agent', 'kiro', '--dry-run', '--json']);
+    const preview = JSON.parse(output.mock.calls.at(-1)?.[0] as string) as {
+      operations: Array<{ action: string; path: string }>;
+    };
+    expect(preview.operations).toContainEqual(
+      expect.objectContaining({ action: 'create', path: '.kiro/steering/rule-cli.md' }),
+    );
+    expect(preview.operations).toContainEqual(
+      expect.objectContaining({ action: 'create', path: '.kiro/skills/cli-skill/SKILL.md' }),
+    );
+
+    await run(['sync', '--workspace', root, '--agent', 'kiro', '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).applied)
+      .toContain('.kiro/steering/rule-cli.md');
+    await expect(readFile(path.join(root, '.kiro/steering/rule-cli.md'), 'utf8'))
+      .resolves.toContain('inclusion: fileMatch');
+    await run(['sync', '--workspace', root, '--agent', 'kiro', '--check', '--json']);
+    expect(JSON.parse(output.mock.calls.at(-1)?.[0] as string).drift).toBe(false);
+  });
 });
