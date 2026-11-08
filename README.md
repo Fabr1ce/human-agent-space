@@ -5,6 +5,8 @@ and syncs it to the coding agents you use. Instead of maintaining separate
 copies of instructions for each agent, write rules and skills once under
 `.has/`, review changes safely, and keep the agent-specific files in sync.
 
+[Website](https://fabr1ce.github.io/human-agent-space/) · [MIT License](LICENSE)
+
 HAS helps when you switch between agents, work across several projects, or want
 to preserve shared team guidance. It does not replace your normal editor, agent,
 or workflow; you can keep working as usual and adopt HAS incrementally.
@@ -31,13 +33,9 @@ Requires Git and Node.js 22 or newer. HAS does not yet have a supported npm
 release. The short npm name `has` belongs to an unrelated package, so
 `npm install has` will not install Human-Agent Space.
 
-Copy the HTTPS clone URL from the HAS repository's **Code** button, then use
-it in place of the value below:
-
 ```sh
-HAS_REPOSITORY_URL='paste-the-HTTPS-clone-URL-here'
 mkdir -p "$HOME/src"
-git clone "$HAS_REPOSITORY_URL" "$HOME/src/human-agent-space"
+git clone https://github.com/Fabr1ce/human-agent-space.git "$HOME/src/human-agent-space"
 cd "$HOME/src/human-agent-space"
 npm ci
 npm run build

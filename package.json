@@ -2,6 +2,7 @@
   "name": "has",
   "version": "0.1.0",
   "description": "A local-first, agent-independent human and coding-agent workspace",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "has": "./dist/bin/has.js"
