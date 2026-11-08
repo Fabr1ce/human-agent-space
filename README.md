@@ -25,32 +25,45 @@ flowchart LR
   resolve --> preview
 ```
 
-## Get started
+## Install HAS from source
 
-Requires Node.js 22 or newer.
+Requires Git and Node.js 22 or newer. HAS does not yet have a supported npm
+release. The short npm name `has` belongs to an unrelated package, so
+`npm install has` will not install Human-Agent Space.
+
+Copy the HTTPS clone URL from the HAS repository's **Code** button, then use
+it in place of the value below:
 
 ```sh
-npm install
+HAS_REPOSITORY_URL='paste-the-HTTPS-clone-URL-here'
+mkdir -p "$HOME/src"
+git clone "$HAS_REPOSITORY_URL" "$HOME/src/human-agent-space"
+cd "$HOME/src/human-agent-space"
+npm ci
 npm run build
-npm test
 ```
 
-For a source checkout, make the `has` command available by running `npm link`
-from the HAS directory after building. If you prefer not to link it, invoke
-`node /path/to/human-agent-space/dist/bin/has.js` from the project directory.
-
-Initialize HAS **from the root of the project you want to configure**. This
-creates `<project>/.has/`; it does not initialize whichever directory happens
-to contain the installed HAS package.
+Keep the checkout wherever convenient. To use its built CLI, set `HAS` to the
+built entry point, then change to the **root of the project you want HAS to
+configure**:
 
 ```sh
+HAS="$HOME/src/human-agent-space/dist/bin/has.js"
 cd /path/to/your/project
-has init
-has status
+node "$HAS" init --workspace "$PWD"
+node "$HAS" status --workspace "$PWD"
 ```
 
-To initialize personal guidance shared across projects, run `has init
---global`; this creates `~/.has/`.
+`init` creates `<project>/.has/` in the selected project; it does not initialize
+the HAS source checkout. Add `--global` to `init` to create personal guidance
+under `~/.has/` instead. Continue to invoke the source CLI as `node "$HAS"`
+until a supported package distribution is available. The commands below use
+`$HAS`; set it again if you open a new terminal.
+
+**Future download option:** a scoped npm package used through `npx`/`npm exec`
+could avoid both global installation and this manual build. Package ownership,
+name, and release are not established yet, so that route is not available or
+recommended today.
 
 ## Add guidance and sync it
 
@@ -61,22 +74,40 @@ may include supporting files. HAS validates and lists this content; it never
 executes skill scripts.
 
 ```sh
-has rules list
-has skills list
-has sync --dry-run
-has sync
+HAS="$HOME/src/human-agent-space/dist/bin/has.js"
+node "$HAS" rules list --workspace "$PWD"
+node "$HAS" skills list --workspace "$PWD"
+node "$HAS" sync --dry-run --workspace "$PWD"
+node "$HAS" sync --workspace "$PWD"
 ```
 
 Review the dry-run plan, then sync to generate project files for GitHub Copilot
-and Claude Code. `has sync --check` checks whether generated files have drifted.
+and Claude Code. `node "$HAS" sync --check --workspace "$PWD"` checks whether
+generated files have drifted.
 If any target conflicts with a hand-written or edited file, HAS preserves it
 and applies **none** of that sync plan. Resolve conflicts, then rerun sync.
 Before adopting a file, copy any edits you want to keep into the canonical
-`.has/rules/` or `.has/skills/` source: `has adopt <path>` replaces only that
-target, saves a local backup, and does not merge its edits back into HAS.
+`.has/rules/` or `.has/skills/` source: `node "$HAS" adopt <path>` replaces
+only that target, saves a local backup, and does not merge its edits back into
+HAS. Add `--workspace "$PWD"` to the command when running it outside the
+project root.
 
 Project knowledge overrides global knowledge with the same rule ID or skill
 name. Temporary runtime data is kept under `.has/.local/` and gitignored.
 Verify agent trust settings in each agent; HAS cannot inspect them.
 
 See [`docs/ADAPTERS.md`](docs/ADAPTERS.md) for supported formats and limitations.
+
+## Contributing and running tests
+
+From the HAS source checkout, install dependencies and run the build, tests,
+and coverage gate:
+
+```sh
+npm ci
+npm run build
+npm test
+npm run test:coverage
+```
+
+The coverage command enforces at least 85% line coverage.
