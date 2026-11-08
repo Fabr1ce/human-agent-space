@@ -84,5 +84,3 @@ bundled by HAS (`npm ls rulesync @intellectronica/ruler --depth=0` showed no
 direct dependency). HAS uses its own small built-in adapters because `rulesync`
 generation can write changed target files without HAS's explicit adoption and
 hand-edit preservation safeguards. No `rulesync` implementation code is copied.
-
-See [the full tool evaluation](decisions/sync-tool-evaluation.md).
