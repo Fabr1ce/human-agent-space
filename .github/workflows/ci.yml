@@ -11,16 +11,24 @@ on:  # yamllint disable-line rule:truthy
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # SHA-pinned action references exceed the configured line-length limit.
+      # yamllint disable rule:line-length
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7
         with:
           node-version: 22
           cache: npm
+      # yamllint enable rule:line-length
       - run: npm ci
-      - run: npm run build
+      - run: npm run site:build
       - run: npm test
       - run: npm run test:coverage

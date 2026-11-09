@@ -1,0 +1,55 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+  color: #172033;
+  background: #f7f8fc;
+}
+
+body {
+  box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  line-height: 1.65;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+a {
+  color: #3949ab;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 8px;
+  background: #e7eaf4;
+}
+
+code {
+  font-family: ui-monospace, monospace;
+}
+
+blockquote {
+  margin-left: 0;
+  padding-left: 16px;
+  border-left: 4px solid #c5cae9;
+  color: #48536a;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 8px;
+  border: 1px solid #c5cad6;
+  text-align: left;
+}
