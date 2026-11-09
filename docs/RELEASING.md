@@ -4,6 +4,23 @@ The temporary npm package name is `human-agent-space`. No npm release is
 available yet. Before the first release, confirm that the name is available
 and that project maintainers control the npm account that will publish it.
 
+## Initial publication
+
+npm trusted publishers are configured on an existing package, so bootstrap the
+package once from a maintainer's local machine:
+
+1. After the release changes are merged to `main`, confirm the publishing
+   account with `npm login --auth-type=web` and `npm whoami`.
+2. From the repository root, run `npm ci`, `npm run build`, `npm test`,
+   `npm run test:coverage`, and `npm pack --dry-run`.
+3. Publish the initial version with `npm publish --access public`. npm may
+   require interactive two-factor authentication for this first publish.
+
+The initial version is published manually; subsequent tagged versions can use
+GitHub Actions OIDC. Configure the trusted publisher below shortly before the
+next release. Its first successful publish must complete within two days.
+Never put an npm password or token in the repository or share it in chat.
+
 ## One-time setup
 
 1. Configure npm trusted publishing for the `Fabr1ce/human-agent-space`
