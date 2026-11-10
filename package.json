@@ -42,7 +42,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.15.30",
-    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/coverage-v8": "^5.1.0",
     "marked": "^18.1.3",
     "typescript": "^5.8.3",
     "vitest": "^4.1.12"
