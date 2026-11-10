@@ -27,13 +27,33 @@ flowchart LR
   resolve --> preview
 ```
 
+## Install HAS
+
+Install the published npm package globally (requires Node.js 22 or newer):
+
+```sh
+npm install --global human-agent-space
+```
+
+Then run the `has` CLI from the root of the project you want HAS to
+configure:
+
+```sh
+cd /path/to/your/project
+has init --workspace "$PWD"
+has status --workspace "$PWD"
+```
+
+To run it without installing, prefix commands with `npx` (for example,
+`npx human-agent-space init --workspace "$PWD"`). The short npm name `has`
+belongs to an unrelated package, so `npm install has` will not install
+Human-Agent Space.
+
 ## Install HAS from source
 
-Requires Git and Node.js 22 or newer. The npm package is planned as
-`human-agent-space`, but it is not published yet. The short npm name `has`
-belongs to an unrelated package, so `npm install has` will not install
-Human-Agent Space. Once the package is published, install it with
-`npm install --global human-agent-space`. Until then, install from source:
+Build the CLI locally when you want to change HAS itself, or to try
+unpublished changes before they are released. Requires Git and Node.js 22 or
+newer.
 
 ```sh
 mkdir -p "$HOME/src"
@@ -56,11 +76,8 @@ node "$HAS" status --workspace "$PWD"
 
 `init` creates `<project>/.has/` in the selected project; it does not initialize
 the HAS source checkout. Add `--global` to `init` to create personal guidance
-under `~/.has/` instead. Continue to invoke the source CLI as `node "$HAS"`
-until a supported package distribution is available. The commands below use
-`$HAS`; set it again if you open a new terminal.
-
-Do not rely on `npx` or `npm exec` for HAS until the npm release is announced.
+under `~/.has/` instead. The commands below use `$HAS`; set it again if you
+open a new terminal.
 
 ## Add guidance and sync it
 
