@@ -105,8 +105,6 @@ must be marked with its verification status in `docs/ADAPTERS.md` and in code.
 
 ---
 
----
-
 ## ADR-007 — Read-only local web view: deferred
 
 **Status:** Accepted  

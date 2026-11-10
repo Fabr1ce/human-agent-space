@@ -41,6 +41,12 @@
   Include the upstream release tag in an adjacent comment and use Dependabot
   for update pull requests; do not reference mutable version tags or branches.
 
+## Pull request workflow
+
+- After every push to a pull-request branch, check the PR's mergeability and
+  conflict status in GitHub. Resolve any conflicts and check again; a successful
+  push does not guarantee that the PR is mergeable.
+
 ## Documentation
 
 - Keep documentation concise, clear, and friendly to readers who are new to
