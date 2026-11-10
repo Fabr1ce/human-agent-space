@@ -4,3 +4,4 @@ dist/
 *.local.yaml
 /coverage/
 /site-dist/
+.kiro/specs/human-agent-space/
