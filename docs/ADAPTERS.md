@@ -1,9 +1,10 @@
 # Built-in Agent Adapters
 
-HAS projects canonical `.has/rules/` and `.has/skills/` content to GitHub
-Copilot, Claude Code, and Kiro. Project-specific entries override global
-entries with the same rule ID or skill name. Sync never executes skill scripts
-or resources.
+HAS projects canonical `.has/rules/` and `.has/skills/` content to the supported
+coding agents. Project-specific entries override global entries with the same
+rule ID or skill name. Sync never executes skill scripts or resources.
+
+<!-- HAS:BEGIN-ADAPTERS -->
 
 ## GitHub Copilot
 
@@ -11,6 +12,8 @@ or resources.
 path-specific instruction files and agent skills. Which Copilot surfaces load
 each customization depends on the client and feature; verify support in the
 specific Copilot surface/version in use.
+
+**Capabilities:** path-scoped rules: yes; native skills: yes.
 
 | Canonical content | Project output | Projection |
 |---|---|---|
@@ -27,6 +30,8 @@ Official references:
 **Verification:** Verified against Kiro's current steering and skills
 documentation for workspace file formats and discovery. This does not verify a
 specific installed Kiro surface or version.
+
+**Capabilities:** path-scoped rules: yes; native skills: yes.
 
 | Canonical content | Project output | Projection |
 |---|---|---|
@@ -53,6 +58,8 @@ Official references:
 rules, path-scoped rules, and skills. This verifies documented file formats and
 discovery, not the presence or version of Claude Code on the user's machine.
 
+**Capabilities:** path-scoped rules: yes; native skills: yes.
+
 | Canonical content | Project output | Projection |
 |---|---|---|
 | Rule | `.claude/rules/<rule-id>.md` | Canonical `globs` are emitted as `paths` frontmatter. Empty `globs` produces a rule without `paths`, so it is always loaded. |
@@ -62,6 +69,8 @@ Official references:
 
 - [Claude Code memory and project rules](https://code.claude.com/docs/en/memory)
 - [Claude Code skills](https://code.claude.com/docs/en/skills)
+
+<!-- HAS:END-ADAPTERS -->
 
 ## Sync safety and user workflow
 
@@ -73,14 +82,3 @@ Official references:
 - Unchanged generated files that are no longer represented by canonical sources are listed for deletion. Modified stale files are reported as conflicts and kept.
 - Every generated Markdown rule or `SKILL.md` includes a comment pointing to the canonical source. Skill assets are copied as data; they are never run.
 - Sync currently targets the project repository only. Global canonical rules and skills can contribute to the project's generated outputs, but HAS does not write into a user's global agent configuration.
-
-## Why `rulesync` is a reference, not a dependency
-
-The `rulesync` project was evaluated at
-[`596bbc85032a7e0bd8a5c4c013b02c9fc4ae554d`](https://github.com/dyoshikawa/rulesync/tree/596bbc85032a7e0bd8a5c4c013b02c9fc4ae554d).
-Its documented Copilot/Claude target coverage, file layouts, dry-run, and drift
-check helped verify target-format choices. It is not installed, invoked, or
-bundled by HAS (`npm ls rulesync @intellectronica/ruler --depth=0` showed no
-direct dependency). HAS uses its own small built-in adapters because `rulesync`
-generation can write changed target files without HAS's explicit adoption and
-hand-edit preservation safeguards. No `rulesync` implementation code is copied.

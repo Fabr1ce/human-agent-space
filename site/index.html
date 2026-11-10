@@ -67,6 +67,13 @@
         margin-top: 48px;
         font-size: 0.95rem;
       }
+
+      .agents {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 28px;
+        padding-left: 20px;
+      }
     </style>
   </head>
   <body>
@@ -74,7 +81,7 @@
     <h1>Human-Agent Space</h1>
     <p>
       Keep project rules and reusable skills in one human-owned workspace.
-      HAS safely syncs them to GitHub Copilot and Claude Code, so guidance
+      HAS validates and syncs them to your local coding agent, so guidance
       stays consistent when you switch tools.
     </p>
     <p>
@@ -82,9 +89,15 @@
       file, HAS preserves it and applies nothing until you resolve the conflict.
     </p>
     <div class="links">
-      <a href="https://github.com/Fabr1ce/human-agent-space">View the project</a>
+      <a href="README.html">Read the documentation</a>
+      <a class="secondary" href="docs/ADAPTERS.html">Supported agents</a>
+      <a class="secondary" href="https://github.com/Fabr1ce/human-agent-space">View the project</a>
       <a class="secondary" href="https://github.com/Fabr1ce/human-agent-space#install-has-from-source">Get started</a>
     </div>
+    <h2>Supported agents</h2>
+    <ul class="agents">
+      <!-- GENERATED_ADAPTERS -->
+    </ul>
     <p class="note">Local-first, open source, and built to keep you in control.</p>
   </body>
 </html>

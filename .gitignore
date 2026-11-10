@@ -3,3 +3,4 @@ dist/
 .local/
 *.local.yaml
 /coverage/
+/site-dist/

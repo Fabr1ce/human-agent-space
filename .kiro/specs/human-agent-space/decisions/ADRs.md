@@ -105,28 +105,6 @@ must be marked with its verification status in `docs/ADAPTERS.md` and in code.
 
 ---
 
-## ADR-006 — `rulesync` / `ruler` evaluation required before sync engine build
-
-**Status:** Accepted  
-**Date:** 2026-11-03  
-**Decided by:** Human
-
-**Decision:** Before building a custom sync engine in Phase 2 (TASK-2.4), evaluate `rulesync` and `ruler` as potential dependencies or references. Present findings and wait for approval before proceeding.
-
-**Approval record (2026-11-05):** After reviewing a source-based comparison,
-the human approved proceeding with a minimal built-in Copilot and Claude Code
-implementation, using `rulesync` only as a target-format reference. Neither
-candidate is approved as a runtime dependency. The comparison is retained in
-private workspace notes, not in this repository.
-
-**Rationale:** Avoids reinventing existing tooling. If either project covers the needed surface with acceptable license, maintenance, and safety characteristics, wrapping or depending on it is preferable to a full custom build.
-
-**Consequences:** TASK-2.1 is a hard prerequisite for TASK-2.4. The approved
-implementation has no `rulesync` or `ruler` runtime dependency and does not
-copy their implementation code.
-
----
-
 ## ADR-007 — Read-only local web view: deferred
 
 **Status:** Accepted  

@@ -85,13 +85,7 @@ criteria pass.
 
 ---
 
-## Phase 2 (MVP) — Copilot and Claude Code Sync
-
-### TASK-2.1 Evaluate `rulesync` / `ruler` (hard gate)
-- Inspect both projects: license, maintenance, adapter coverage, safety, extensibility
-- Present findings and recommendation before any sync engine code is written
-- Record decision in `docs/decisions/`
-- **Acceptance:** Written finding exists; human approves or rejects dependency before TASK-2.4 starts
+## Phase 2 (MVP) — GitHub Copilot, Claude Code, and Kiro Sync
 
 ### TASK-2.2 GitHub Copilot adapter
 - Research and document Copilot instruction file paths, custom instructions, and skill projections
