@@ -1,6 +1,6 @@
 {
   "name": "human-agent-space",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local-first, agent-independent human and coding-agent workspace",
   "license": "MIT",
   "repository": {
