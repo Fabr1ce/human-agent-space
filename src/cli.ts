@@ -30,7 +30,7 @@ export function createProgram(): Command {
   program
     .name('has')
     .description('A local-first workspace for humans and coding agents')
-    .version('0.1.0');
+    .version('0.1.1');
 
   program
     .command('init')
