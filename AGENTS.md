@@ -35,8 +35,28 @@
   reopen, and on each commit pushed to a pull-request branch. Keep CI aligned
   with the local project checks above.
 
+## GitHub Actions
+
+- Pin remote Actions and reusable workflow references to full commit SHAs.
+  Include the upstream release tag in an adjacent comment and use Dependabot
+  for update pull requests; do not reference mutable version tags or branches.
+
+## Pull request workflow
+
+- After every push to a pull-request branch, check the PR's mergeability and
+  conflict status in GitHub. Resolve any conflicts and check again; a successful
+  push does not guarantee that the PR is mergeable.
+
 ## Documentation
 
 - Keep documentation concise, clear, and friendly to readers who are new to
   HAS. Prefer practical steps and plain language; explain why a feature matters
   without unnecessary detail or jargon.
+- Keep the public site accurate when changing user-visible behavior, supported
+  adapters, commands, or installation. The homepage adapter list is generated
+  from `listAdapters()` in `src/adapters/registry.ts`; the corresponding
+  adapter sections in `docs/ADAPTERS.md` must match that registry. Update the
+  relevant README, adapter guide, or site source when its content needs to
+  change. Run `npm run site:build` to validate the adapter documentation and
+  render the site. CI runs this on every pull request, and Pages rebuilds after
+  relevant code and documentation changes merge to `main`.
